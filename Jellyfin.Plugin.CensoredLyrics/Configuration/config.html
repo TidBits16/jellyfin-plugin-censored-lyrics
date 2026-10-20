@@ -6,14 +6,10 @@
 <body>
     <div id="censoredLyricsConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage">
         <style>
-            #censoredLyricsConfigurationPage .word-row {
-                display: flex;
-                gap: 0.5em;
-                align-items: center;
-                margin: 0 0 0.4em;
-            }
-            #censoredLyricsConfigurationPage .word-row input {
-                flex: 1;
+            #censoredLyricsConfigurationPage #words {
+                width: 100%;
+                min-height: 18em;
+                box-sizing: border-box;
             }
             #censoredLyricsConfigurationPage .choices {
                 display: flex;
@@ -51,10 +47,7 @@
         </style>
         <div data-role="content">
             <div class="content-primary">
-                <div id="words"></div>
-                <button is="emby-button" type="button" id="addWord" class="raised">
-                    <span>Add</span>
-                </button>
+                <textarea id="words" is="emby-textarea" class="emby-textarea" spellcheck="false"></textarea>
                 <div id="styles" class="choices"></div>
                 <div id="masks" class="choices"></div>
                 <details>
@@ -146,40 +139,15 @@
                     });
                 },
 
-                addRow: function (word) {
-                    var row = document.createElement("div");
-                    row.className = "word-row";
-                    var input = document.createElement("input");
-                    input.type = "text";
-                    input.className = "emby-input";
-                    input.value = word || "";
-                    var remove = document.createElement("button");
-                    remove.type = "button";
-                    remove.className = "raised";
-                    remove.textContent = "Remove";
-                    remove.addEventListener("click", function () {
-                        row.remove();
-                    });
-                    row.appendChild(input);
-                    row.appendChild(remove);
-                    document.getElementById("words").appendChild(row);
-                    if (!word) input.focus();
-                },
-
                 words: function () {
-                    return Array.prototype.map.call(document.querySelectorAll("#words input"), function (input) {
-                        return input.value.trim();
-                    }).filter(function (word) {
-                        return word.length > 0;
-                    });
+                    return document.getElementById("words").value
+                        .split(/\r?\n/)
+                        .map(function (line) { return line.trim(); })
+                        .filter(function (word) { return word.length > 0; });
                 },
 
                 fill: function (config) {
-                    var box = document.getElementById("words");
-                    box.innerHTML = "";
-                    var lines = (config.Words || "").split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
-                    if (!lines.length) lines = [""];
-                    lines.forEach(function (word) { CensoredLyricsConfiguration.addRow(word); });
+                    document.getElementById("words").value = (config.Words || "").replace(/\r\n/g, "\n");
                     var style = document.querySelector("input[name='style'][value='" + (config.Style || "FirstLetter") + "']");
                     var mask = document.querySelector("input[name='mask'][value='" + (config.Mask || "Asterisk") + "']");
                     if (style) style.checked = true;
@@ -221,7 +189,7 @@
                         if (status.Error) el.textContent = status.Error;
                         else if (status.Total) el.textContent = status.Processed + " / " + status.Total;
                         else el.textContent = "";
-                        ["applyButton", "saveButton", "forceButton", "addWord"].forEach(function (id) {
+                        ["applyButton", "saveButton", "forceButton"].forEach(function (id) {
                             var button = document.getElementById(id);
                             if (button) button.disabled = !!status.Running;
                         });
@@ -240,10 +208,6 @@
                     Dashboard.hideLoadingMsg();
                     CensoredLyricsConfiguration.poll();
                 });
-            });
-
-            document.getElementById("addWord").addEventListener("click", function () {
-                CensoredLyricsConfiguration.addRow("");
             });
 
             document.getElementById("saveButton").addEventListener("click", function () {
