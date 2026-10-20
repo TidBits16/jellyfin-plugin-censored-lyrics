@@ -18,5 +18,20 @@ public enum MaskCharacters
     /// <summary>
     /// A mix of @, #, and ?.
     /// </summary>
-    Symbols
+    Symbols,
+
+    /// <summary>
+    /// Hyphens.
+    /// </summary>
+    Hyphen,
+
+    /// <summary>
+    /// Square brackets with a blank inside.
+    /// </summary>
+    Brackets,
+
+    /// <summary>
+    /// Underlines.
+    /// </summary>
+    Underline
 }

@@ -50,6 +50,9 @@
                             <option value="Asterisk">* asterisks</option>
                             <option value="Hash"># roblox</option>
                             <option value="Symbols">@#? random symbols</option>
+                            <option value="Hyphen">- hyphen</option>
+                            <option value="Brackets">[  ] empty brackets</option>
+                            <option value="Underline">_ underline</option>
                         </select>
                     </div>
                     <details>
@@ -78,12 +81,20 @@
                 alphabet: function (mask) {
                     if (mask === "Hash") return "#";
                     if (mask === "Symbols") return "@#?";
+                    if (mask === "Hyphen") return "-";
+                    if (mask === "Underline") return "_";
                     return "*";
                 },
 
                 preview: function (style, mask) {
                     var sample = "beans";
                     if (style === "None") return sample;
+                    if (mask === "Brackets") {
+                        var blanks = style === "WholeWord" ? sample.length : sample.length - 1;
+                        var inside = "";
+                        for (var n = 0; n < blanks; n++) inside += " ";
+                        return style === "WholeWord" ? "[" + inside + "]" : sample.charAt(0) + "[" + inside + "]";
+                    }
                     var chars = CensoredLyricsConfiguration.alphabet(mask);
                     var text = "";
                     for (var i = 0; i < sample.length; i++) {

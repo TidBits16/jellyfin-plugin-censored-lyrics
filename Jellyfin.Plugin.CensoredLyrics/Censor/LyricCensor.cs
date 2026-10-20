@@ -12,12 +12,14 @@ public sealed partial class LyricCensor
 {
     private readonly HashSet<string> _banned;
     private readonly CensorStyle _style;
+    private readonly MaskCharacters _mask;
     private readonly string _alphabet;
 
-    private LyricCensor(HashSet<string> banned, CensorStyle style, string alphabet)
+    private LyricCensor(HashSet<string> banned, CensorStyle style, MaskCharacters mask, string alphabet)
     {
         _banned = banned;
         _style = style;
+        _mask = mask;
         _alphabet = alphabet;
     }
 
@@ -34,10 +36,12 @@ public sealed partial class LyricCensor
         {
             MaskCharacters.Hash => "#",
             MaskCharacters.Symbols => "@#?",
+            MaskCharacters.Hyphen => "-",
+            MaskCharacters.Underline => "_",
             _ => "*"
         };
 
-        return new LyricCensor(NormalizeAll(banned), style, alphabet);
+        return new LyricCensor(NormalizeAll(banned), style, mask, alphabet);
     }
 
     /// <summary>
@@ -68,6 +72,15 @@ public sealed partial class LyricCensor
         if (!IsProfane(token))
         {
             return token;
+        }
+
+        if (_mask == MaskCharacters.Brackets)
+        {
+            var blanks = _style == CensorStyle.WholeWord ? token.Length : Math.Max(0, token.Length - 1);
+            var inside = new string(' ', blanks);
+            return _style == CensorStyle.WholeWord
+                ? "[" + inside + "]"
+                : token[0] + "[" + inside + "]";
         }
 
         var chars = token.ToCharArray();

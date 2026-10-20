@@ -30,6 +30,12 @@ public class LyricCensorTests
         Assert.Equal("****", Censor(CensorStyle.WholeWord).Censor("fuck"));
         Assert.Equal("f###", Censor(CensorStyle.FirstLetter, MaskCharacters.Hash).Censor("fuck"));
         Assert.Equal("####", Censor(CensorStyle.WholeWord, MaskCharacters.Hash).Censor("fuck"));
+        Assert.Equal("f---", Censor(CensorStyle.FirstLetter, MaskCharacters.Hyphen).Censor("fuck"));
+        Assert.Equal("----", Censor(CensorStyle.WholeWord, MaskCharacters.Hyphen).Censor("fuck"));
+        Assert.Equal("f___", Censor(CensorStyle.FirstLetter, MaskCharacters.Underline).Censor("fuck"));
+        Assert.Equal("____", Censor(CensorStyle.WholeWord, MaskCharacters.Underline).Censor("fuck"));
+        Assert.Equal("f[   ]", Censor(CensorStyle.FirstLetter, MaskCharacters.Brackets).Censor("fuck"));
+        Assert.Equal("[    ]", Censor(CensorStyle.WholeWord, MaskCharacters.Brackets).Censor("fuck"));
 
         var symbols = Censor(CensorStyle.FirstLetter, MaskCharacters.Symbols).Censor("fuck");
         Assert.Equal('f', symbols[0]);
