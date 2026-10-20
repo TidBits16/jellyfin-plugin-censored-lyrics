@@ -31,7 +31,7 @@ meta = {
     "changelog": changelog,
     "description": "Downloads timed lyrics from LRCLIB and censors words from an editable list.",
     "guid": "d045e257-f274-46e5-a2a7-b88f72c725e9",
-    "name": "Censored Lyrics",
+    "name": "Censored LRCLIB",
     "overview": "Timed LRCLIB lyrics with swear words censored.",
     "owner": "TidBits16",
     "targetAbi": abi,
@@ -47,16 +47,16 @@ PY
   rm -rf "${stage}"
 }
 
-package_one net10.0 1.0.17.0 12.0.0.0 "Jellyfin 12. Save is the blue full-width button above Apply."
-package_one net9.0 1.0.16.0 10.11.0.0 "Jellyfin 10.11. Save is the blue full-width button above Apply."
+package_one net10.0 1.0.19.0 12.0.0.0 "Jellyfin 12. The plugin is now named Censored LRCLIB."
+package_one net9.0 1.0.18.0 10.11.0.0 "Jellyfin 10.11. The plugin is now named Censored LRCLIB."
 
 python3 - "${dist}" "${stamp}" <<'PY'
 import hashlib, json, pathlib, sys
 dist, stamp = sys.argv[1:]
-repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.17.0"
+repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.19.0"
 entries = [
-    ("1.0.17.0", "12.0.0.0", "Jellyfin 12. Save is the blue full-width button above Apply."),
-    ("1.0.16.0", "10.11.0.0", "Jellyfin 10.11. Save is the blue full-width button above Apply."),
+    ("1.0.19.0", "12.0.0.0", "Jellyfin 12. The plugin is now named Censored LRCLIB."),
+    ("1.0.18.0", "10.11.0.0", "Jellyfin 10.11. The plugin is now named Censored LRCLIB."),
 ]
 manifest_path = pathlib.Path(dist).parent / "manifest.json"
 previous = json.loads(manifest_path.read_text())[0]["versions"] if manifest_path.exists() else []
@@ -81,7 +81,7 @@ versions = sorted(versions.values(), key=version_key, reverse=True)
 
 manifest = [{
     "guid": "d045e257-f274-46e5-a2a7-b88f72c725e9",
-    "name": "Censored Lyrics",
+    "name": "Censored LRCLIB",
     "description": "Downloads timed lyrics from LRCLIB and censors words from an editable list.\n",
     "overview": "Timed LRCLIB lyrics with a word list you can edit.",
     "owner": "TidBits16",

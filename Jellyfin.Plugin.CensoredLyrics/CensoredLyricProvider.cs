@@ -38,7 +38,7 @@ public sealed class CensoredLyricProvider : ILyricProvider
     }
 
     /// <inheritdoc />
-    public string Name => CensoredLyricsPlugin.Instance?.Name ?? "Censored Lyrics";
+    public string Name => CensoredLyricsPlugin.Instance?.Name ?? "Censored LRCLIB";
 
     /// <inheritdoc />
     public async Task<IEnumerable<RemoteLyricInfo>> SearchAsync(LyricSearchRequest request, CancellationToken cancellationToken)
@@ -128,7 +128,7 @@ public sealed class CensoredLyricProvider : ILyricProvider
         return new RemoteLyricInfo
         {
             Id = record.Id.ToString(CultureInfo.InvariantCulture) + "_" + (synced ? SyncedSuffix : PlainSuffix),
-            ProviderName = CensoredLyricsPlugin.Instance?.Name ?? "Censored Lyrics",
+            ProviderName = CensoredLyricsPlugin.Instance?.Name ?? "Censored LRCLIB",
             Metadata = new LyricMetadata
             {
                 Album = record.AlbumName,

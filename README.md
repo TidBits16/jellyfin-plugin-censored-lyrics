@@ -1,4 +1,4 @@
-# Censored Lyrics
+# Censored LRCLIB
 
 Jellyfin plugin that downloads **timed lyrics from [LRCLIB](https://lrclib.net)** and censors swear words before Jellyfin saves them.
 
@@ -17,21 +17,21 @@ The server has to be able to download the manifest, so the repository is public.
 
 1. Open **Dashboard → Plugins → Repositories**.
 2. Choose **Add Repository**.
-3. Name it `Censored Lyrics`.
+3. Name it `Censored LRCLIB`.
 4. Set the repository URL to:
 
    ```text
    https://raw.githubusercontent.com/TidBits16/jellyfin-plugin-censored-lyrics/main/manifest.json
    ```
 
-5. Open **Catalog**, find **Censored Lyrics** under **Music**, and install it.
+5. Open **Catalog**, find **Censored LRCLIB** under **Music**, and install it.
 6. Restart Jellyfin.
 
 Jellyfin 12 installs the newest 12 build. Jellyfin 10.11 installs the newest 10.11 build.
 
 ## Use it
 
-Open **Dashboard → Plugins → Censored Lyrics**. Pick how words are masked, then **Apply**. Apply saves and fetches lyrics for songs that have not been fetched yet. **Save** only stores the settings. The word list and **Force Refresh all Lyrics** are under **Advanced**. Force refresh fetches every song again and overwrites its lyrics.
+Open **Dashboard → Plugins → Censored LRCLIB**. Pick how words are masked, then **Apply**. Apply saves and fetches lyrics for songs that have not been fetched yet. **Save** only stores the settings. The word list and **Force Refresh all Lyrics** are under **Advanced**. Force refresh fetches every song again and overwrites its lyrics.
 
 ## Build
 

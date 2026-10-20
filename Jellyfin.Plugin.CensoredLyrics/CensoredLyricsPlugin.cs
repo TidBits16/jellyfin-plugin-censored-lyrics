@@ -33,7 +33,7 @@ public sealed class CensoredLyricsPlugin : BasePlugin<PluginConfiguration>, IHas
     public static CensoredLyricsPlugin? Instance { get; private set; }
 
     /// <inheritdoc />
-    public override string Name => "Censored Lyrics";
+    public override string Name => "Censored LRCLIB";
 
     /// <inheritdoc />
     public override Guid Id => Guid.Parse("d045e257-f274-46e5-a2a7-b88f72c725e9");
