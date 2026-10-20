@@ -17,6 +17,9 @@ public sealed class PluginServiceRegistrator : IPluginServiceRegistrator
         ArgumentNullException.ThrowIfNull(serviceCollection);
         ArgumentNullException.ThrowIfNull(applicationHost);
 
+        serviceCollection.AddSingleton<LyricLookup>();
+        serviceCollection.AddSingleton<LyricRefreshService>();
+
         serviceCollection.AddHttpClient(CensoredLyricsPlugin.HttpClientName, client =>
         {
             client.Timeout = TimeSpan.FromSeconds(20);

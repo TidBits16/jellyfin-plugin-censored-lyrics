@@ -29,7 +29,7 @@ path, version, abi, stamp, changelog = sys.argv[1:]
 meta = {
     "category": "Music",
     "changelog": changelog,
-    "description": "Downloads timed lyrics from LRCLIB and masks swear words before Jellyfin saves them. Each blocked word keeps its first letter, so \"fuck\" is stored as \"f***\". Line timestamps are left intact.",
+    "description": "Downloads timed lyrics from LRCLIB and censors words from an editable list.",
     "guid": "d045e257-f274-46e5-a2a7-b88f72c725e9",
     "name": "Censored Lyrics",
     "overview": "Timed LRCLIB lyrics with swear words censored.",
@@ -47,36 +47,43 @@ PY
   rm -rf "${stage}"
 }
 
-package_one net10.0 1.0.1.0 12.0.0.0 "Jellyfin 12. Initial release. Timed LRCLIB lyrics with profanity censoring."
-package_one net9.0 1.0.0.0 10.11.0.0 "Jellyfin 10.11. Initial release. Timed LRCLIB lyrics with profanity censoring."
+package_one net10.0 1.0.3.0 12.0.0.0 "Jellyfin 12. Editable censor list, mask style, and a library refresh that only fetches new songs."
+package_one net9.0 1.0.2.0 10.11.0.0 "Jellyfin 10.11. Editable censor list, mask style, and a library refresh that only fetches new songs."
 
 python3 - "${dist}" "${stamp}" <<'PY'
 import hashlib, json, pathlib, sys
 dist, stamp = sys.argv[1:]
-repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.1.0"
+repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.3.0"
 entries = [
-    ("1.0.1.0", "12.0.0.0", "Jellyfin 12. Initial release. Timed LRCLIB lyrics with profanity censoring."),
-    ("1.0.0.0", "10.11.0.0", "Jellyfin 10.11. Initial release. Timed LRCLIB lyrics with profanity censoring."),
+    ("1.0.3.0", "12.0.0.0", "Jellyfin 12. Editable censor list, mask style, and a library refresh that only fetches new songs."),
+    ("1.0.2.0", "10.11.0.0", "Jellyfin 10.11. Editable censor list, mask style, and a library refresh that only fetches new songs."),
 ]
-versions = []
+manifest_path = pathlib.Path(dist).parent / "manifest.json"
+previous = json.loads(manifest_path.read_text())[0]["versions"] if manifest_path.exists() else []
+versions = {item["version"]: item for item in previous}
 for version, abi, changelog in entries:
     zip_path = pathlib.Path(dist) / f"censored-lyrics_{version}.zip"
     digest = hashlib.md5(zip_path.read_bytes()).hexdigest()
-    versions.append({
+    versions[version] = {
         "version": version,
         "changelog": changelog,
         "targetAbi": abi,
         "sourceUrl": f"{repo}/censored-lyrics_{version}.zip",
         "checksum": digest,
         "timestamp": stamp,
-    })
+    }
     print(f"{version} {digest} {zip_path}")
+
+def version_key(item):
+    return tuple(int(part) for part in item["version"].split("."))
+
+versions = sorted(versions.values(), key=version_key, reverse=True)
 
 manifest = [{
     "guid": "d045e257-f274-46e5-a2a7-b88f72c725e9",
     "name": "Censored Lyrics",
-    "description": "Downloads timed lyrics from LRCLIB and masks swear words before Jellyfin saves them. Each blocked word keeps its first letter, so \"fuck\" is stored as \"f***\". Line timestamps are left intact.\n",
-    "overview": "Timed LRCLIB lyrics with swear words censored.",
+    "description": "Downloads timed lyrics from LRCLIB and censors words from an editable list.\n",
+    "overview": "Timed LRCLIB lyrics with a word list you can edit.",
     "owner": "TidBits16",
     "category": "Music",
     "versions": versions,

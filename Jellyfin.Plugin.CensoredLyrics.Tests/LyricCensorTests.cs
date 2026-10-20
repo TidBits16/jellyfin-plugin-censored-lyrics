@@ -1,19 +1,20 @@
 using Jellyfin.Plugin.CensoredLyrics.Censor;
+using Jellyfin.Plugin.CensoredLyrics.Configuration;
 using Xunit;
 
 namespace Jellyfin.Plugin.CensoredLyrics.Tests;
 
 public class LyricCensorTests
 {
-    private static LyricCensor Strict()
+    private static LyricCensor Censor(CensorStyle style = CensorStyle.FirstLetter, MaskCharacters mask = MaskCharacters.Asterisk)
     {
-        return ProfanityCatalog.Create(includeMild: true, extra: null, allowed: null);
+        return ProfanityCatalog.Create(ProfanityCatalog.SplitWords(ProfanityCatalog.DefaultWordText), style, mask);
     }
 
     [Fact]
     public void Masks_fuck_and_keeps_the_first_letter()
     {
-        var censor = Strict();
+        var censor = Censor();
 
         Assert.Equal("f***", censor.Censor("fuck"));
         Assert.Equal("F***", censor.Censor("Fuck"));
@@ -23,9 +24,23 @@ public class LyricCensorTests
     }
 
     [Fact]
+    public void Whole_word_and_hash_and_symbols_follow_the_setting()
+    {
+        Assert.Equal("beans", Censor(CensorStyle.None).Censor("beans"));
+        Assert.Equal("****", Censor(CensorStyle.WholeWord).Censor("fuck"));
+        Assert.Equal("f###", Censor(CensorStyle.FirstLetter, MaskCharacters.Hash).Censor("fuck"));
+        Assert.Equal("####", Censor(CensorStyle.WholeWord, MaskCharacters.Hash).Censor("fuck"));
+
+        var symbols = Censor(CensorStyle.FirstLetter, MaskCharacters.Symbols).Censor("fuck");
+        Assert.Equal('f', symbols[0]);
+        Assert.All(symbols[1..], character => Assert.Contains(character, "@#?"));
+        Assert.Equal(symbols, Censor(CensorStyle.FirstLetter, MaskCharacters.Symbols).Censor("fuck"));
+    }
+
+    [Fact]
     public void Keeps_timestamps_and_censors_the_line()
     {
-        var censor = Strict();
+        var censor = Censor();
         const string line = "[00:17.12] I feel the fuck in the room";
 
         Assert.Equal("[00:17.12] I feel the f*** in the room", censor.Censor(line));
@@ -38,7 +53,7 @@ public class LyricCensorTests
     [Fact]
     public void Leaves_ordinary_words_alone()
     {
-        var censor = Strict();
+        var censor = Censor();
         string[] safe =
         [
             "class", "classic", "assault", "assembly", "assassin", "assess", "assert", "assume",
@@ -58,7 +73,7 @@ public class LyricCensorTests
     [Fact]
     public void Masks_suffixes_punctuation_and_stretched_spellings()
     {
-        var censor = Strict();
+        var censor = Censor();
 
         Assert.Equal("f*****'", censor.Censor("fuckin'"));
         Assert.Equal("s***!", censor.Censor("shit!"));
@@ -73,29 +88,31 @@ public class LyricCensorTests
     }
 
     [Fact]
-    public void Mild_words_follow_the_setting()
+    public void The_word_list_is_what_gets_censored()
     {
-        var withMild = ProfanityCatalog.Create(true, null, null);
-        var withoutMild = ProfanityCatalog.Create(false, null, null);
+        var censor = ProfanityCatalog.Create(["beans"], CensorStyle.FirstLetter, MaskCharacters.Asterisk);
 
-        Assert.Equal("h***", withMild.Censor("hell"));
-        Assert.Equal("d***", withMild.Censor("damn"));
-        Assert.Equal("hell", withoutMild.Censor("hell"));
-        Assert.Equal("damn", withoutMild.Censor("damn"));
-        Assert.Equal("f***", withoutMild.Censor("fuck"));
-        Assert.Equal("hello", withMild.Censor("hello"));
+        Assert.Equal("b****", censor.Censor("beans"));
+        Assert.Equal("fuck", censor.Censor("fuck"));
+        Assert.Contains("ass", ProfanityCatalog.DefaultWordText.Split('\n'));
+        Assert.Contains("fuck", ProfanityCatalog.DefaultWordText.Split('\n'));
     }
 
     [Fact]
-    public void Extra_and_allowed_words_override_the_built_in_list()
+    public void Cache_remembers_songs_that_were_fetched()
     {
-        var censor = ProfanityCatalog.Create(true, "yeet", "fuck");
+        var path = Path.Combine(Path.GetTempPath(), "censored-lyrics-cache-" + Guid.NewGuid().ToString("N") + ".json");
+        var id = Guid.NewGuid();
+        var store = new LyricCacheStore(path);
+        Assert.False(store.TryGet(id, out _));
 
-        Assert.Equal("y***", censor.Censor("yeet"));
-        Assert.Equal("Y***", censor.Censor("Yeet"));
-        Assert.Equal("fuck", censor.Censor("fuck"));
-        Assert.Equal("fucking", censor.Censor("fucking"));
-        Assert.Equal("s***", censor.Censor("shit"));
+        store.Set(id, new LyricCacheEntry { Synced = "[00:01.00] hello", Plain = "hello" });
+
+        var loaded = new LyricCacheStore(path);
+        Assert.True(loaded.TryGet(id, out var entry));
+        Assert.Equal("[00:01.00] hello", entry.Synced);
+        Assert.False(loaded.TryGet(Guid.NewGuid(), out _));
+        File.Delete(path);
     }
 
     [Fact]

@@ -3,7 +3,7 @@ using MediaBrowser.Model.Plugins;
 namespace Jellyfin.Plugin.CensoredLyrics.Configuration;
 
 /// <summary>
-/// Settings for LRCLIB lookup and profanity censoring.
+/// Words to censor and how they are masked.
 /// </summary>
 public class PluginConfiguration : BasePluginConfiguration
 {
@@ -13,32 +13,44 @@ public class PluginConfiguration : BasePluginConfiguration
     public const string DefaultBaseUrl = "https://lrclib.net";
 
     /// <summary>
-    /// Gets or sets a value indicating whether fetched lyrics are censored.
+    /// Gets or sets the words to censor, one per line.
     /// </summary>
-    public bool EnableCensoring { get; set; } = true;
+    public string Words { get; set; } = Censor.ProfanityCatalog.DefaultWordText;
 
     /// <summary>
-    /// Gets or sets a value indicating whether milder words such as damn, hell, crap, and bloody are censored.
+    /// Gets or sets how matched words are replaced.
     /// </summary>
-    public bool IncludeMildProfanity { get; set; } = true;
+    public string Style { get; set; } = CensorStyle.FirstLetter.ToString();
 
     /// <summary>
-    /// Gets or sets a value indicating whether synced lyrics are preferred over plain lyrics.
+    /// Gets or sets the mask characters.
     /// </summary>
-    public bool PreferSyncedLyrics { get; set; } = true;
+    public string Mask { get; set; } = MaskCharacters.Asterisk.ToString();
 
     /// <summary>
-    /// Gets or sets extra words to censor, one per line or separated by commas.
-    /// </summary>
-    public string ExtraWords { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets words that should never be censored, one per line or separated by commas.
-    /// </summary>
-    public string AllowedWords { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the LRCLIB base URL. Use this for a self-hosted LRCLIB instance.
+    /// Gets or sets the LRCLIB base URL.
     /// </summary>
     public string BaseUrl { get; set; } = DefaultBaseUrl;
+
+    /// <summary>
+    /// Reads <see cref="Style"/>.
+    /// </summary>
+    /// <returns>The selected style, or first-letter when the saved value is unknown.</returns>
+    public CensorStyle GetStyle()
+    {
+        return Enum.TryParse<CensorStyle>(Style, ignoreCase: true, out var style)
+            ? style
+            : CensorStyle.FirstLetter;
+    }
+
+    /// <summary>
+    /// Reads <see cref="Mask"/>.
+    /// </summary>
+    /// <returns>The selected characters, or asterisks when the saved value is unknown.</returns>
+    public MaskCharacters GetMask()
+    {
+        return Enum.TryParse<MaskCharacters>(Mask, ignoreCase: true, out var mask)
+            ? mask
+            : MaskCharacters.Asterisk;
+    }
 }

@@ -2,11 +2,27 @@
     {
         "guid": "d045e257-f274-46e5-a2a7-b88f72c725e9",
         "name": "Censored Lyrics",
-        "description": "Downloads timed lyrics from LRCLIB and masks swear words before Jellyfin saves them. Each blocked word keeps its first letter, so \"fuck\" is stored as \"f***\". Line timestamps are left intact.\n",
-        "overview": "Timed LRCLIB lyrics with swear words censored.",
+        "description": "Downloads timed lyrics from LRCLIB and censors words from an editable list.\n",
+        "overview": "Timed LRCLIB lyrics with a word list you can edit.",
         "owner": "TidBits16",
         "category": "Music",
         "versions": [
+            {
+                "version": "1.0.3.0",
+                "changelog": "Jellyfin 12. Editable censor list, mask style, and a library refresh that only fetches new songs.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.3.0/censored-lyrics_1.0.3.0.zip",
+                "checksum": "78032b6a43bb7beb6d03d7cc4c65c375",
+                "timestamp": "2026-10-20T16:52:24Z"
+            },
+            {
+                "version": "1.0.2.0",
+                "changelog": "Jellyfin 10.11. Editable censor list, mask style, and a library refresh that only fetches new songs.",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.3.0/censored-lyrics_1.0.2.0.zip",
+                "checksum": "a60a9e73451b247357267dc40e2eb80a",
+                "timestamp": "2026-10-20T16:52:24Z"
+            },
             {
                 "version": "1.0.1.0",
                 "changelog": "Jellyfin 12. Initial release. Timed LRCLIB lyrics with profanity censoring.",

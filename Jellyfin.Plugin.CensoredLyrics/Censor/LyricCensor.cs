@@ -1,45 +1,55 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Jellyfin.Plugin.CensoredLyrics.Configuration;
 
 namespace Jellyfin.Plugin.CensoredLyrics.Censor;
 
 /// <summary>
-/// Masks whole-word profanity while keeping the first letter and the original length.
-/// "fuck" becomes "f***". LRC timestamp tags are left unchanged.
+/// Masks words from the configured list. LRC timestamps are left unchanged.
 /// </summary>
 public sealed partial class LyricCensor
 {
     private static readonly string[] Suffixes = ["ers", "ing", "es", "ed", "er", "in", "s"];
 
     private readonly HashSet<string> _banned;
-    private readonly HashSet<string> _allowed;
+    private readonly CensorStyle _style;
+    private readonly string _alphabet;
 
-    private LyricCensor(HashSet<string> banned, HashSet<string> allowed)
+    private LyricCensor(HashSet<string> banned, CensorStyle style, string alphabet)
     {
         _banned = banned;
-        _allowed = allowed;
+        _style = style;
+        _alphabet = alphabet;
     }
 
     /// <summary>
-    /// Builds a censor from word lists. Matching is case-insensitive.
+    /// Builds a censor from a word list.
     /// </summary>
     /// <param name="banned">Words that should be masked.</param>
-    /// <param name="allowed">Words that should be left alone, even if they are also banned.</param>
-    /// <returns>A censor that applies both lists.</returns>
-    public static LyricCensor Create(IEnumerable<string> banned, IEnumerable<string> allowed)
+    /// <param name="style">How matched words are replaced.</param>
+    /// <param name="mask">Which characters replace the letters.</param>
+    /// <returns>A censor for that list.</returns>
+    public static LyricCensor Create(IEnumerable<string> banned, CensorStyle style, MaskCharacters mask)
     {
-        return new LyricCensor(NormalizeAll(banned), NormalizeAll(allowed));
+        var alphabet = mask switch
+        {
+            MaskCharacters.Hash => "#",
+            MaskCharacters.Symbols => "@#?",
+            _ => "*"
+        };
+
+        return new LyricCensor(NormalizeAll(banned), style, alphabet);
     }
 
     /// <summary>
-    /// Returns <paramref name="text"/> with profanity masked. Timestamps in square or angle brackets are preserved.
+    /// Returns <paramref name="text"/> with listed words masked. Timestamps in square or angle brackets are preserved.
     /// </summary>
     /// <param name="text">Lyric text, plain or LRC.</param>
     /// <returns>The censored text.</returns>
     public string Censor(string? text)
     {
-        if (string.IsNullOrEmpty(text) || _banned.Count == 0)
+        if (string.IsNullOrEmpty(text) || _style == CensorStyle.None || _banned.Count == 0)
         {
             return text ?? string.Empty;
         }
@@ -63,18 +73,37 @@ public sealed partial class LyricCensor
         }
 
         var chars = token.ToCharArray();
-        for (var i = 1; i < chars.Length; i++)
+        var start = _style == CensorStyle.WholeWord ? 0 : 1;
+        for (var i = start; i < chars.Length; i++)
         {
-            chars[i] = '*';
+            chars[i] = MaskAt(token, i);
         }
 
         return new string(chars);
     }
 
+    private char MaskAt(string token, int index)
+    {
+        if (_alphabet.Length == 1)
+        {
+            return _alphabet[0];
+        }
+
+        var hash = 17;
+        foreach (var character in token)
+        {
+            hash = (hash * 31) + character;
+        }
+
+        hash = (hash * 31) + index;
+        var bucket = hash == int.MinValue ? 0 : Math.Abs(hash);
+        return _alphabet[bucket % _alphabet.Length];
+    }
+
     private bool IsProfane(string token)
     {
         var normalized = Normalize(token);
-        if (normalized.Length < 3 || _allowed.Contains(normalized))
+        if (normalized.Length < 3)
         {
             return false;
         }
@@ -90,26 +119,17 @@ public sealed partial class LyricCensor
         }
 
         var collapsedToTwo = CollapseRuns(normalized, 3, 2);
-        if (!string.Equals(collapsedToTwo, normalized, StringComparison.Ordinal)
-            && !_allowed.Contains(collapsedToTwo)
-            && Matches(collapsedToTwo))
+        if (!string.Equals(collapsedToTwo, normalized, StringComparison.Ordinal) && Matches(collapsedToTwo))
         {
             return true;
         }
 
         var collapsedToOne = CollapseRuns(normalized, 2, 1);
-        return !string.Equals(collapsedToOne, normalized, StringComparison.Ordinal)
-            && !_allowed.Contains(collapsedToOne)
-            && Matches(collapsedToOne);
+        return !string.Equals(collapsedToOne, normalized, StringComparison.Ordinal) && Matches(collapsedToOne);
     }
 
     private bool Matches(string word)
     {
-        if (_allowed.Contains(word))
-        {
-            return false;
-        }
-
         if (_banned.Contains(word))
         {
             return true;
@@ -122,13 +142,7 @@ public sealed partial class LyricCensor
                 continue;
             }
 
-            var stem = word[..^suffix.Length];
-            if (_allowed.Contains(stem))
-            {
-                return false;
-            }
-
-            if (_banned.Contains(stem))
+            if (_banned.Contains(word[..^suffix.Length]))
             {
                 return true;
             }

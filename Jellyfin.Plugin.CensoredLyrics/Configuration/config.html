@@ -5,91 +5,260 @@
 </head>
 <body>
     <div id="censoredLyricsConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage">
+        <style>
+            #censoredLyricsConfigurationPage .word-row {
+                display: flex;
+                gap: 0.5em;
+                align-items: center;
+                margin: 0 0 0.4em;
+            }
+            #censoredLyricsConfigurationPage .word-row input {
+                flex: 1;
+            }
+            #censoredLyricsConfigurationPage .choices {
+                display: flex;
+                flex-direction: column;
+                gap: 0.35em;
+                margin: 1.25em 0;
+            }
+            #censoredLyricsConfigurationPage .choices label {
+                display: flex;
+                gap: 0.5em;
+                align-items: center;
+            }
+            #censoredLyricsConfigurationPage details {
+                margin: 1.25em 0;
+            }
+            #censoredLyricsConfigurationPage summary {
+                cursor: pointer;
+                margin-bottom: 0.75em;
+            }
+            #censoredLyricsConfigurationPage .actions {
+                display: flex;
+                gap: 0.75em;
+                margin-top: 1.25em;
+            }
+            #censoredLyricsConfigurationPage #forceButton {
+                background: #c62828;
+                color: #fff;
+            }
+            #censoredLyricsConfigurationPage #runStatus:empty {
+                display: none;
+            }
+            #censoredLyricsConfigurationPage #runStatus {
+                margin-top: 0.75em;
+            }
+        </style>
         <div data-role="content">
             <div class="content-primary">
-                <form id="censoredLyricsConfigurationForm">
-                    <div class="verticalSection verticalSection-extrabottompadding">
-                        <div class="sectionTitleContainer flex align-items-center">
-                            <h2 class="sectionTitle">Censored Lyrics</h2>
-                        </div>
-                        <div class="fieldDescription">
-                            Lyrics are downloaded from LRCLIB. Swear words keep their first letter and the rest becomes asterisks, so "fuck" is saved as "f***". Timestamps are not changed. Lyrics already saved on disk stay as they are until you download them again.
-                        </div>
-                        <label class="checkboxContainer">
-                            <input is="emby-checkbox" type="checkbox" id="enableCensoring" />
-                            <span>Censor swear words</span>
-                        </label>
-                        <label class="checkboxContainer">
-                            <input is="emby-checkbox" type="checkbox" id="includeMildProfanity" />
-                            <span>Also censor mild words (damn, hell, crap, bloody)</span>
-                        </label>
-                        <label class="checkboxContainer">
-                            <input is="emby-checkbox" type="checkbox" id="preferSyncedLyrics" />
-                            <span>Prefer timed lyrics over plain lyrics</span>
-                        </label>
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="extraWords">Extra words to censor</label>
-                            <textarea id="extraWords" rows="6"></textarea>
-                            <div class="fieldDescription">One word per line, or separated by commas. "yeet" is saved as "y***".</div>
-                        </div>
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="allowedWords">Words to leave alone</label>
-                            <textarea id="allowedWords" rows="6"></textarea>
-                            <div class="fieldDescription">These words are never censored. Use this for names such as Dick, or for a mild word you want to keep.</div>
-                        </div>
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="baseUrl">LRCLIB address</label>
-                            <input is="emby-input" id="baseUrl" class="emby-input" required="required" />
-                            <div class="fieldDescription">Leave this as https://lrclib.net unless you run your own LRCLIB server.</div>
-                        </div>
-                        <br />
-                        <button is="emby-button" type="submit" class="raised button-submit block">
-                            <span>Save</span>
-                        </button>
-                    </div>
-                </form>
+                <div id="words"></div>
+                <button is="emby-button" type="button" id="addWord" class="raised">
+                    <span>Add</span>
+                </button>
+                <div id="styles" class="choices"></div>
+                <div id="masks" class="choices"></div>
+                <details>
+                    <summary>Advanced</summary>
+                    <button is="emby-button" type="button" id="forceButton" class="raised">
+                        <span>Force Refresh all Lyrics</span>
+                    </button>
+                </details>
+                <div id="runStatus"></div>
+                <div class="actions">
+                    <button is="emby-button" type="button" id="applyButton" class="raised button-submit">
+                        <span>Apply</span>
+                    </button>
+                    <button is="emby-button" type="button" id="saveButton" class="raised">
+                        <span>Save</span>
+                    </button>
+                </div>
             </div>
         </div>
         <script type="text/javascript">
             var CensoredLyricsConfiguration = {
                 pluginId: "d045e257-f274-46e5-a2a7-b88f72c725e9",
+                pollTimer: 0,
 
-                load: function () {
-                    Dashboard.showLoadingMsg();
-                    ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
-                        document.querySelector("#enableCensoring").checked = config.EnableCensoring !== false;
-                        document.querySelector("#includeMildProfanity").checked = config.IncludeMildProfanity !== false;
-                        document.querySelector("#preferSyncedLyrics").checked = config.PreferSyncedLyrics !== false;
-                        document.querySelector("#extraWords").value = config.ExtraWords || "";
-                        document.querySelector("#allowedWords").value = config.AllowedWords || "";
-                        document.querySelector("#baseUrl").value = config.BaseUrl || "https://lrclib.net";
-                        Dashboard.hideLoadingMsg();
+                alphabet: function (mask) {
+                    if (mask === "Hash") return "#";
+                    if (mask === "Symbols") return "@#?";
+                    return "*";
+                },
+
+                preview: function (style, mask) {
+                    var sample = "beans";
+                    if (style === "None") return sample;
+                    var chars = CensoredLyricsConfiguration.alphabet(mask);
+                    var text = "";
+                    for (var i = 0; i < sample.length; i++) {
+                        if (style === "FirstLetter" && i === 0) text += sample.charAt(0);
+                        else text += chars.charAt((style === "FirstLetter" ? i - 1 : i) % chars.length);
+                    }
+                    return text;
+                },
+
+                selected: function (name, fallback) {
+                    var picked = document.querySelector("input[name='" + name + "']:checked");
+                    return picked ? picked.value : fallback;
+                },
+
+                renderChoices: function () {
+                    var mask = CensoredLyricsConfiguration.selected("mask", "Asterisk");
+                    var style = CensoredLyricsConfiguration.selected("style", "FirstLetter");
+                    var styles = [
+                        ["None", "None"],
+                        ["FirstLetter", "FirstLetter"],
+                        ["WholeWord", "WholeWord"]
+                    ];
+                    var styleBox = document.getElementById("styles");
+                    styleBox.innerHTML = "";
+                    styles.forEach(function (item) {
+                        var label = document.createElement("label");
+                        var input = document.createElement("input");
+                        input.type = "radio";
+                        input.name = "style";
+                        input.value = item[0];
+                        input.checked = item[0] === style;
+                        input.addEventListener("change", CensoredLyricsConfiguration.renderChoices);
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(CensoredLyricsConfiguration.preview(item[0], mask)));
+                        styleBox.appendChild(label);
+                    });
+
+                    var masks = [
+                        ["Asterisk", "* asterisks"],
+                        ["Hash", "# roblox"],
+                        ["Symbols", "@#? random symbols"]
+                    ];
+                    var maskBox = document.getElementById("masks");
+                    maskBox.innerHTML = "";
+                    masks.forEach(function (item) {
+                        var label = document.createElement("label");
+                        var input = document.createElement("input");
+                        input.type = "radio";
+                        input.name = "mask";
+                        input.value = item[0];
+                        input.checked = item[0] === mask;
+                        input.addEventListener("change", CensoredLyricsConfiguration.renderChoices);
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(item[1]));
+                        maskBox.appendChild(label);
                     });
                 },
 
+                addRow: function (word) {
+                    var row = document.createElement("div");
+                    row.className = "word-row";
+                    var input = document.createElement("input");
+                    input.type = "text";
+                    input.className = "emby-input";
+                    input.value = word || "";
+                    var remove = document.createElement("button");
+                    remove.type = "button";
+                    remove.className = "raised";
+                    remove.textContent = "Remove";
+                    remove.addEventListener("click", function () {
+                        row.remove();
+                    });
+                    row.appendChild(input);
+                    row.appendChild(remove);
+                    document.getElementById("words").appendChild(row);
+                    if (!word) input.focus();
+                },
+
+                words: function () {
+                    return Array.prototype.map.call(document.querySelectorAll("#words input"), function (input) {
+                        return input.value.trim();
+                    }).filter(function (word) {
+                        return word.length > 0;
+                    });
+                },
+
+                fill: function (config) {
+                    var box = document.getElementById("words");
+                    box.innerHTML = "";
+                    var lines = (config.Words || "").split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+                    if (!lines.length) lines = [""];
+                    lines.forEach(function (word) { CensoredLyricsConfiguration.addRow(word); });
+                    var style = document.querySelector("input[name='style'][value='" + (config.Style || "FirstLetter") + "']");
+                    var mask = document.querySelector("input[name='mask'][value='" + (config.Mask || "Asterisk") + "']");
+                    if (style) style.checked = true;
+                    if (mask) mask.checked = true;
+                    CensoredLyricsConfiguration.renderChoices();
+                },
+
                 save: function () {
-                    Dashboard.showLoadingMsg();
-                    ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
-                        config.EnableCensoring = document.querySelector("#enableCensoring").checked;
-                        config.IncludeMildProfanity = document.querySelector("#includeMildProfanity").checked;
-                        config.PreferSyncedLyrics = document.querySelector("#preferSyncedLyrics").checked;
-                        config.ExtraWords = document.querySelector("#extraWords").value;
-                        config.AllowedWords = document.querySelector("#allowedWords").value;
-                        config.BaseUrl = document.querySelector("#baseUrl").value;
-                        ApiClient.updatePluginConfiguration(CensoredLyricsConfiguration.pluginId, config).then(function (result) {
-                            Dashboard.processPluginConfigurationUpdateResult(result);
+                    return ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
+                        config.Words = CensoredLyricsConfiguration.words().join("\n");
+                        config.Style = CensoredLyricsConfiguration.selected("style", "FirstLetter");
+                        config.Mask = CensoredLyricsConfiguration.selected("mask", "Asterisk");
+                        return ApiClient.updatePluginConfiguration(CensoredLyricsConfiguration.pluginId, config);
+                    });
+                },
+
+                run: function (force) {
+                    return CensoredLyricsConfiguration.save().then(function () {
+                        return ApiClient.ajax({
+                            type: "POST",
+                            url: ApiClient.getUrl("CensoredLyrics/Run", { force: force }),
+                            dataType: "json"
                         });
+                    }).then(function () {
+                        CensoredLyricsConfiguration.poll();
+                    }, function () {
+                        CensoredLyricsConfiguration.poll();
+                    });
+                },
+
+                poll: function () {
+                    if (CensoredLyricsConfiguration.pollTimer) {
+                        clearTimeout(CensoredLyricsConfiguration.pollTimer);
+                        CensoredLyricsConfiguration.pollTimer = 0;
+                    }
+                    ApiClient.getJSON(ApiClient.getUrl("CensoredLyrics/Status")).then(function (status) {
+                        var el = document.getElementById("runStatus");
+                        if (!el) return;
+                        if (status.Error) el.textContent = status.Error;
+                        else if (status.Total) el.textContent = status.Processed + " / " + status.Total;
+                        else el.textContent = "";
+                        ["applyButton", "saveButton", "forceButton", "addWord"].forEach(function (id) {
+                            var button = document.getElementById(id);
+                            if (button) button.disabled = !!status.Running;
+                        });
+                        if (status.Running) {
+                            CensoredLyricsConfiguration.pollTimer = setTimeout(CensoredLyricsConfiguration.poll, 1000);
+                        }
                     });
                 }
             };
 
             document.getElementById("censoredLyricsConfigurationPage").addEventListener("pageshow", function () {
-                CensoredLyricsConfiguration.load();
+                CensoredLyricsConfiguration.renderChoices();
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
+                    CensoredLyricsConfiguration.fill(config);
+                    Dashboard.hideLoadingMsg();
+                    CensoredLyricsConfiguration.poll();
+                });
             });
 
-            document.getElementById("censoredLyricsConfigurationForm").addEventListener("submit", function (event) {
-                event.preventDefault();
-                CensoredLyricsConfiguration.save();
+            document.getElementById("addWord").addEventListener("click", function () {
+                CensoredLyricsConfiguration.addRow("");
+            });
+
+            document.getElementById("saveButton").addEventListener("click", function () {
+                Dashboard.showLoadingMsg();
+                CensoredLyricsConfiguration.save().then(function (result) {
+                    Dashboard.processPluginConfigurationUpdateResult(result);
+                });
+            });
+
+            document.getElementById("applyButton").addEventListener("click", function () {
+                CensoredLyricsConfiguration.run(false);
+            });
+
+            document.getElementById("forceButton").addEventListener("click", function () {
+                CensoredLyricsConfiguration.run(true);
             });
         </script>
     </div>

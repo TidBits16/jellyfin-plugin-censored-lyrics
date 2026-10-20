@@ -27,23 +27,11 @@ The server has to be able to download the manifest, so the repository is public.
 5. Open **Catalog**, find **Censored Lyrics** under **Music**, and install it.
 6. Restart Jellyfin.
 
-Jellyfin 12 installs version 1.0.1.0. Jellyfin 10.11 installs version 1.0.0.0. Older servers are not supported.
+Jellyfin 12 installs the newest 12 build. Jellyfin 10.11 installs the newest 10.11 build.
 
 ## Use it
 
-1. If the official **LrcLib Lyrics** plugin is also installed, disable it or put **Censored Lyrics** first in the music library's lyric provider order. Jellyfin saves the first result it gets, and the other plugin does not censor.
-2. Download lyrics again. Open a song's lyric editor and search, or run Jellyfin's lyric download scheduled task.
-3. Lyrics that were already saved are not rewritten. Delete those lyric files, or search again, so the censored copy replaces them.
-
-Settings are under **Dashboard → Plugins → Censored Lyrics**:
-
-- Turn censoring on or off.
-- Include or skip mild words (`damn`, `hell`, `crap`, `bloody`).
-- Add your own words. `yeet` becomes `y***`.
-- List words that should never be censored, such as a name.
-- Point the plugin at `https://lrclib.net` or at your own LRCLIB server.
-
-Matching is whole-word. `class`, `cocktail`, `assassin`, and `hello` are left alone. Common endings (`fucking`, `shit!`) and stretched spellings (`fuuuck`, `sh1t`) are masked.
+Open **Dashboard → Plugins → Censored Lyrics**. Edit the word list, pick how words are masked, then **Apply**. Apply saves and fetches lyrics for songs that have not been fetched yet. **Save** only stores the settings. **Advanced → Force Refresh all Lyrics** fetches every song again and overwrites its lyrics.
 
 ## Build
 
@@ -52,7 +40,7 @@ dotnet test Jellyfin.Plugin.CensoredLyrics.slnx -c Release
 ./build/package.sh
 ```
 
-`./build/package.sh` runs the tests, writes `dist/censored-lyrics_1.0.1.0.zip` (Jellyfin 12) and `dist/censored-lyrics_1.0.0.0.zip` (Jellyfin 10.11), and refreshes `manifest.json` with the MD5 checksum Jellyfin checks on install.
+`./build/package.sh` runs the tests, writes the plugin zips, and refreshes `manifest.json` with the MD5 checksum Jellyfin checks on install.
 
 ## License
 
