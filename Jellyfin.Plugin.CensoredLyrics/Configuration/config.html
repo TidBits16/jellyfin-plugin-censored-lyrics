@@ -44,9 +44,9 @@
                     <p class="intro">Fetches timed lyrics and censors them.</p>
                     <div class="selectContainer">
                         <select is="emby-select" id="style" label="Censor">
-                            <option value="None">beans</option>
-                            <option value="FirstLetter">b****</option>
-                            <option value="WholeWord">*****</option>
+                            <option value="None">shoot - Nothing</option>
+                            <option value="FirstLetter">s**** - All but first letter</option>
+                            <option value="WholeWord">***** - Whole word</option>
                         </select>
                     </div>
                     <div class="fieldDescription">How much of a word to cover.</div>
@@ -99,21 +99,23 @@
                 },
 
                 preview: function (style, mask) {
-                    var sample = "beans";
-                    if (style === "None") return sample;
+                    var sample = "shoot";
+                    var caption = style === "WholeWord" ? "Whole word" : style === "FirstLetter" ? "All but first letter" : "Nothing";
+                    if (style === "None") return sample + " - " + caption;
+                    var masked = "";
                     if (mask === "Brackets") {
                         var blanks = style === "WholeWord" ? sample.length : sample.length - 1;
                         var inside = "";
                         for (var n = 0; n < blanks; n++) inside += " ";
-                        return style === "WholeWord" ? "[" + inside + "]" : sample.charAt(0) + "[" + inside + "]";
+                        masked = style === "WholeWord" ? "[" + inside + "]" : sample.charAt(0) + "[" + inside + "]";
+                    } else {
+                        var chars = CensoredLyricsConfiguration.alphabet(mask);
+                        for (var i = 0; i < sample.length; i++) {
+                            if (style === "FirstLetter" && i === 0) masked += sample.charAt(0);
+                            else masked += chars.charAt((style === "FirstLetter" ? i - 1 : i) % chars.length);
+                        }
                     }
-                    var chars = CensoredLyricsConfiguration.alphabet(mask);
-                    var text = "";
-                    for (var i = 0; i < sample.length; i++) {
-                        if (style === "FirstLetter" && i === 0) text += sample.charAt(0);
-                        else text += chars.charAt((style === "FirstLetter" ? i - 1 : i) % chars.length);
-                    }
-                    return text;
+                    return masked + " - " + caption;
                 },
 
                 refreshStyleLabels: function () {
