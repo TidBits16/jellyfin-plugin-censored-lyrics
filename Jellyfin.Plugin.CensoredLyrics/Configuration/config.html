@@ -6,6 +6,12 @@
 <body>
     <div id="censoredLyricsConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-select,emby-textarea">
         <style>
+            #censoredLyricsConfigurationPage .intro {
+                margin: 0 0 1.5em;
+            }
+            #censoredLyricsConfigurationPage .fieldDescription {
+                margin: 0.2em 0 1.4em;
+            }
             #censoredLyricsConfigurationPage #words {
                 min-height: 16em;
             }
@@ -35,9 +41,7 @@
         <div data-role="content">
             <div class="content-primary">
                 <form class="configForm">
-                    <div class="inputContainer">
-                        <textarea is="emby-textarea" id="words" label="Words" spellcheck="false"></textarea>
-                    </div>
+                    <p class="intro">Fetches timed lyrics and censors them.</p>
                     <div class="selectContainer">
                         <select is="emby-select" id="style" label="Censor">
                             <option value="None">beans</option>
@@ -45,6 +49,7 @@
                             <option value="WholeWord">*****</option>
                         </select>
                     </div>
+                    <div class="fieldDescription">How much of a word to cover.</div>
                     <div class="selectContainer">
                         <select is="emby-select" id="mask" label="Characters">
                             <option value="Asterisk">* asterisks</option>
@@ -55,11 +60,17 @@
                             <option value="Underline">_ underline</option>
                         </select>
                     </div>
+                    <div class="fieldDescription">What replaces the covered letters.</div>
                     <details>
                         <summary>Advanced</summary>
+                        <div class="inputContainer">
+                            <textarea is="emby-textarea" id="words" label="Words" spellcheck="false"></textarea>
+                        </div>
+                        <div class="fieldDescription">One word per line.</div>
                         <button is="emby-button" type="button" id="forceButton" class="raised block emby-button">
                             <span>Force Refresh all Lyrics</span>
                         </button>
+                        <div class="fieldDescription">Downloads every song again and overwrites its lyrics.</div>
                     </details>
                     <div id="runStatus"></div>
                     <div class="actions">
@@ -70,6 +81,7 @@
                             <span>Save</span>
                         </button>
                     </div>
+                    <div class="fieldDescription">Apply saves and fetches lyrics that are not cached yet. Save only stores these settings.</div>
                 </form>
             </div>
         </div>

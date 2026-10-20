@@ -31,7 +31,7 @@ Jellyfin 12 installs the newest 12 build. Jellyfin 10.11 installs the newest 10.
 
 ## Use it
 
-Open **Dashboard → Plugins → Censored Lyrics**. Edit the word list, pick how words are masked, then **Apply**. Apply saves and fetches lyrics for songs that have not been fetched yet. **Save** only stores the settings. **Advanced → Force Refresh all Lyrics** fetches every song again and overwrites its lyrics.
+Open **Dashboard → Plugins → Censored Lyrics**. Pick how words are masked, then **Apply**. Apply saves and fetches lyrics for songs that have not been fetched yet. **Save** only stores the settings. The word list and **Force Refresh all Lyrics** are under **Advanced**. Force refresh fetches every song again and overwrites its lyrics.
 
 ## Build
 
