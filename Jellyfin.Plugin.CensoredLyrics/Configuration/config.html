@@ -12,6 +12,9 @@
             #censoredLyricsConfigurationPage .fieldDescription {
                 margin: 0.2em 0 1.4em;
             }
+            #censoredLyricsConfigurationPage .selectContainer .fieldDescription {
+                margin: 0.25em 0 0;
+            }
             #censoredLyricsConfigurationPage #words {
                 min-height: 16em;
             }
@@ -56,8 +59,8 @@
                             <option value="FirstLetter" selected>s**** - All but first letter</option>
                             <option value="WholeWord">***** - Whole word</option>
                         </select>
+                        <div class="fieldDescription">How much of a word to cover.</div>
                     </div>
-                    <div class="fieldDescription">How much of a word to cover.</div>
                     <div class="selectContainer">
                         <select is="emby-select" id="mask" label="Characters">
                             <option value="Asterisk" selected>* asterisks</option>
@@ -67,8 +70,8 @@
                             <option value="Brackets">[  ] empty brackets</option>
                             <option value="Underline">_ underline</option>
                         </select>
+                        <div class="fieldDescription">What replaces the covered letters.</div>
                     </div>
-                    <div class="fieldDescription">What replaces the covered letters.</div>
                     <details>
                         <summary>Advanced</summary>
                         <div class="inputContainer">
