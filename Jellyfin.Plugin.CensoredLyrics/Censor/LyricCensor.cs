@@ -10,8 +10,6 @@ namespace Jellyfin.Plugin.CensoredLyrics.Censor;
 /// </summary>
 public sealed partial class LyricCensor
 {
-    private static readonly string[] Suffixes = ["ers", "ing", "es", "ed", "er", "in", "s"];
-
     private readonly HashSet<string> _banned;
     private readonly CensorStyle _style;
     private readonly string _alphabet;
@@ -113,42 +111,7 @@ public sealed partial class LyricCensor
             return false;
         }
 
-        if (Matches(normalized))
-        {
-            return true;
-        }
-
-        var collapsedToTwo = CollapseRuns(normalized, 3, 2);
-        if (!string.Equals(collapsedToTwo, normalized, StringComparison.Ordinal) && Matches(collapsedToTwo))
-        {
-            return true;
-        }
-
-        var collapsedToOne = CollapseRuns(normalized, 2, 1);
-        return !string.Equals(collapsedToOne, normalized, StringComparison.Ordinal) && Matches(collapsedToOne);
-    }
-
-    private bool Matches(string word)
-    {
-        if (_banned.Contains(word))
-        {
-            return true;
-        }
-
-        foreach (var suffix in Suffixes)
-        {
-            if (word.Length <= suffix.Length + 2 || !word.EndsWith(suffix, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            if (_banned.Contains(word[..^suffix.Length]))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return _banned.Contains(normalized);
     }
 
     private static HashSet<string> NormalizeAll(IEnumerable<string> words)
@@ -204,27 +167,6 @@ public sealed partial class LyricCensor
 
                     break;
             }
-        }
-
-        return builder.ToString();
-    }
-
-    private static string CollapseRuns(string word, int minimumRun, int keep)
-    {
-        var builder = new StringBuilder(word.Length);
-        var index = 0;
-        while (index < word.Length)
-        {
-            var runEnd = index + 1;
-            while (runEnd < word.Length && word[runEnd] == word[index])
-            {
-                runEnd++;
-            }
-
-            var runLength = runEnd - index;
-            var copies = runLength >= minimumRun ? keep : runLength;
-            builder.Append(word[index], copies);
-            index = runEnd;
         }
 
         return builder.ToString();

@@ -19,7 +19,7 @@ public class LyricCensorTests
         Assert.Equal("f***", censor.Censor("fuck"));
         Assert.Equal("F***", censor.Censor("Fuck"));
         Assert.Equal("F***", censor.Censor("FUCK"));
-        Assert.Equal("f******", censor.Censor("fucking"));
+        Assert.Equal("fucking", censor.Censor("fucking"));
         Assert.Equal("m***********", censor.Censor("motherfucker"));
     }
 
@@ -71,20 +71,20 @@ public class LyricCensorTests
     }
 
     [Fact]
-    public void Masks_suffixes_punctuation_and_stretched_spellings()
+    public void Masks_a_listed_word_and_leaves_other_spellings()
     {
         var censor = Censor();
 
-        Assert.Equal("f*****'", censor.Censor("fuckin'"));
         Assert.Equal("s***!", censor.Censor("shit!"));
-        Assert.Equal("b******", censor.Censor("bitches"));
         Assert.Equal("a**", censor.Censor("ass"));
         Assert.Equal("a******", censor.Censor("asshole"));
         Assert.Equal("s***", censor.Censor("sh1t"));
         Assert.Equal("a**", censor.Censor("a$$"));
         Assert.Equal("@**", censor.Censor("@ss"));
-        Assert.Equal("f*****", censor.Censor("fuuuck"));
-        Assert.Equal("a***", censor.Censor("asss"));
+        Assert.Equal("fuckin'", censor.Censor("fuckin'"));
+        Assert.Equal("bitches", censor.Censor("bitches"));
+        Assert.Equal("fuuuck", censor.Censor("fuuuck"));
+        Assert.Equal("asss", censor.Censor("asss"));
     }
 
     [Fact]

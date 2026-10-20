@@ -1,6 +1,3 @@
-# One word per line. Lines starting with # are ignored.
-# Strong profanity and slurs. Matched whole-word, plus common suffixes
-# (s, es, ed, er, ers, ing, in) and stretched spellings such as "fuuuck".
 fuck
 motherfuck
 motherfucker
@@ -8,15 +5,8 @@ clusterfuck
 fuckface
 fuckhead
 fuckwit
-fuckboy
-fuckgirl
 fucktard
 fucker
-fuk
-fuq
-phuck
-fvck
-fck
 shit
 bullshit
 horseshit
@@ -28,19 +18,10 @@ shitty
 shittier
 shittiest
 shite
-shyt
 bitch
 bitchy
-biatch
-biyatch
-sonofabitch
 ass
 asshole
-asswipe
-asshat
-assclown
-assface
-assbag
 jackass
 dumbass
 badass
@@ -52,14 +33,11 @@ lameass
 halfass
 dick
 dickhead
-dickwad
-dickface
 prick
 cock
 cocky
 cocksucker
 cockhead
-cockface
 cunt
 twat
 pussy
@@ -68,7 +46,6 @@ wank
 wanker
 bollocks
 bollock
-bugger
 tits
 tit
 titty
@@ -76,7 +53,6 @@ titties
 boob
 boobies
 whore
-whorehouse
 slut
 slutty
 skank
