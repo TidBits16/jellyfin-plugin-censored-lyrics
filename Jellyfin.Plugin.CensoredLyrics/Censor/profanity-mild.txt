@@ -1,0 +1,12 @@
+# Mild words. Used only when "Also censor mild words" is enabled.
+damn
+dammit
+damnit
+damned
+hell
+crap
+crappy
+bloody
+git
+shag
+sodding

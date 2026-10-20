@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Jellyfin.Plugin.CensoredLyrics.Tests/Jellyfin.Plugin.CensoredLyrics.Tests.csproj" />
+  <Project Path="Jellyfin.Plugin.CensoredLyrics/Jellyfin.Plugin.CensoredLyrics.csproj" />
+</Solution>

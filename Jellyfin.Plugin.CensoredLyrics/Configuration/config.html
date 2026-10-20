@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Censored Lyrics</title>
+</head>
+<body>
+    <div id="censoredLyricsConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="censoredLyricsConfigurationForm">
+                    <div class="verticalSection verticalSection-extrabottompadding">
+                        <div class="sectionTitleContainer flex align-items-center">
+                            <h2 class="sectionTitle">Censored Lyrics</h2>
+                        </div>
+                        <div class="fieldDescription">
+                            Lyrics are downloaded from LRCLIB. Swear words keep their first letter and the rest becomes asterisks, so "fuck" is saved as "f***". Timestamps are not changed. Lyrics already saved on disk stay as they are until you download them again.
+                        </div>
+                        <label class="checkboxContainer">
+                            <input is="emby-checkbox" type="checkbox" id="enableCensoring" />
+                            <span>Censor swear words</span>
+                        </label>
+                        <label class="checkboxContainer">
+                            <input is="emby-checkbox" type="checkbox" id="includeMildProfanity" />
+                            <span>Also censor mild words (damn, hell, crap, bloody)</span>
+                        </label>
+                        <label class="checkboxContainer">
+                            <input is="emby-checkbox" type="checkbox" id="preferSyncedLyrics" />
+                            <span>Prefer timed lyrics over plain lyrics</span>
+                        </label>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="extraWords">Extra words to censor</label>
+                            <textarea id="extraWords" rows="6"></textarea>
+                            <div class="fieldDescription">One word per line, or separated by commas. "yeet" is saved as "y***".</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="allowedWords">Words to leave alone</label>
+                            <textarea id="allowedWords" rows="6"></textarea>
+                            <div class="fieldDescription">These words are never censored. Use this for names such as Dick, or for a mild word you want to keep.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="baseUrl">LRCLIB address</label>
+                            <input is="emby-input" id="baseUrl" class="emby-input" required="required" />
+                            <div class="fieldDescription">Leave this as https://lrclib.net unless you run your own LRCLIB server.</div>
+                        </div>
+                        <br />
+                        <button is="emby-button" type="submit" class="raised button-submit block">
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var CensoredLyricsConfiguration = {
+                pluginId: "d045e257-f274-46e5-a2a7-b88f72c725e9",
+
+                load: function () {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
+                        document.querySelector("#enableCensoring").checked = config.EnableCensoring !== false;
+                        document.querySelector("#includeMildProfanity").checked = config.IncludeMildProfanity !== false;
+                        document.querySelector("#preferSyncedLyrics").checked = config.PreferSyncedLyrics !== false;
+                        document.querySelector("#extraWords").value = config.ExtraWords || "";
+                        document.querySelector("#allowedWords").value = config.AllowedWords || "";
+                        document.querySelector("#baseUrl").value = config.BaseUrl || "https://lrclib.net";
+                        Dashboard.hideLoadingMsg();
+                    });
+                },
+
+                save: function () {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
+                        config.EnableCensoring = document.querySelector("#enableCensoring").checked;
+                        config.IncludeMildProfanity = document.querySelector("#includeMildProfanity").checked;
+                        config.PreferSyncedLyrics = document.querySelector("#preferSyncedLyrics").checked;
+                        config.ExtraWords = document.querySelector("#extraWords").value;
+                        config.AllowedWords = document.querySelector("#allowedWords").value;
+                        config.BaseUrl = document.querySelector("#baseUrl").value;
+                        ApiClient.updatePluginConfiguration(CensoredLyricsConfiguration.pluginId, config).then(function (result) {
+                            Dashboard.processPluginConfigurationUpdateResult(result);
+                        });
+                    });
+                }
+            };
+
+            document.getElementById("censoredLyricsConfigurationPage").addEventListener("pageshow", function () {
+                CensoredLyricsConfiguration.load();
+            });
+
+            document.getElementById("censoredLyricsConfigurationForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                CensoredLyricsConfiguration.save();
+            });
+        </script>
+    </div>
+</body>
+</html>
