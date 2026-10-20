@@ -22,7 +22,7 @@ public sealed class LyricRefreshTask : IScheduledTask
     public string Name => "Fetch censored lyrics";
 
     /// <inheritdoc />
-    public string Key => "CensoredLrclibFetch";
+    public string Key => "CensoredLrclibDaily";
 
     /// <inheritdoc />
     public string Description => "Fetches lyrics for songs that have not been fetched yet, then censors them.";
@@ -36,7 +36,7 @@ public sealed class LyricRefreshTask : IScheduledTask
         yield return new TaskTriggerInfo
         {
             Type = TaskTriggerInfoType.DailyTrigger,
-            TimeOfDayTicks = TimeSpan.FromHours(3).Ticks
+            TimeOfDayTicks = TimeSpan.FromHours(2).Ticks
         };
     }
 
