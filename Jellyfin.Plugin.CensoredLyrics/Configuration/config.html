@@ -29,7 +29,15 @@
             }
             #censoredLyricsConfigurationPage .actions {
                 display: flex;
+                flex-direction: column;
                 gap: 0.75em;
+            }
+            #censoredLyricsConfigurationPage .actions button {
+                width: 100%;
+            }
+            #censoredLyricsConfigurationPage #applyButton {
+                background: #757575;
+                color: #fff;
             }
             #censoredLyricsConfigurationPage #runStatus:empty {
                 display: none;
@@ -74,11 +82,11 @@
                     </details>
                     <div id="runStatus"></div>
                     <div class="actions">
-                        <button is="emby-button" type="button" id="applyButton" class="raised button-submit emby-button">
-                            <span>Apply</span>
-                        </button>
-                        <button is="emby-button" type="button" id="saveButton" class="raised emby-button">
+                        <button is="emby-button" type="button" id="saveButton" class="raised button-submit block emby-button">
                             <span>Save</span>
+                        </button>
+                        <button is="emby-button" type="button" id="applyButton" class="raised block emby-button">
+                            <span>Apply</span>
                         </button>
                     </div>
                     <div class="fieldDescription">Apply saves and fetches lyrics that are not cached yet. Save only stores these settings.</div>

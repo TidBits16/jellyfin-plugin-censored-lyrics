@@ -47,16 +47,16 @@ PY
   rm -rf "${stage}"
 }
 
-package_one net10.0 1.0.15.0 12.0.0.0 "Jellyfin 12. Censor choices use shoot as the example."
-package_one net9.0 1.0.14.0 10.11.0.0 "Jellyfin 10.11. Censor choices use shoot as the example."
+package_one net10.0 1.0.17.0 12.0.0.0 "Jellyfin 12. Save is the blue full-width button above Apply."
+package_one net9.0 1.0.16.0 10.11.0.0 "Jellyfin 10.11. Save is the blue full-width button above Apply."
 
 python3 - "${dist}" "${stamp}" <<'PY'
 import hashlib, json, pathlib, sys
 dist, stamp = sys.argv[1:]
-repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.15.0"
+repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.17.0"
 entries = [
-    ("1.0.15.0", "12.0.0.0", "Jellyfin 12. Censor choices use shoot as the example."),
-    ("1.0.14.0", "10.11.0.0", "Jellyfin 10.11. Censor choices use shoot as the example."),
+    ("1.0.17.0", "12.0.0.0", "Jellyfin 12. Save is the blue full-width button above Apply."),
+    ("1.0.16.0", "10.11.0.0", "Jellyfin 10.11. Save is the blue full-width button above Apply."),
 ]
 manifest_path = pathlib.Path(dist).parent / "manifest.json"
 previous = json.loads(manifest_path.read_text())[0]["versions"] if manifest_path.exists() else []
