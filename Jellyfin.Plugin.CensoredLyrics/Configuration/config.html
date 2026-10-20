@@ -4,67 +4,70 @@
     <title>Censored Lyrics</title>
 </head>
 <body>
-    <div id="censoredLyricsConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage">
+    <div id="censoredLyricsConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-select,emby-textarea">
         <style>
             #censoredLyricsConfigurationPage #words {
-                width: 100%;
-                min-height: 18em;
-                box-sizing: border-box;
-            }
-            #censoredLyricsConfigurationPage .choices {
-                display: flex;
-                flex-direction: column;
-                gap: 0.35em;
-                margin: 1.25em 0;
-            }
-            #censoredLyricsConfigurationPage .choices label {
-                display: flex;
-                gap: 0.5em;
-                align-items: center;
+                min-height: 16em;
             }
             #censoredLyricsConfigurationPage details {
-                margin: 1.25em 0;
+                margin: 0.5em 0 1.5em;
             }
             #censoredLyricsConfigurationPage summary {
                 cursor: pointer;
-                margin-bottom: 0.75em;
-            }
-            #censoredLyricsConfigurationPage .actions {
-                display: flex;
-                gap: 0.75em;
-                margin-top: 1.25em;
+                font-size: 1.15em;
+                padding: 0.75em 0;
             }
             #censoredLyricsConfigurationPage #forceButton {
                 background: #c62828;
                 color: #fff;
             }
+            #censoredLyricsConfigurationPage .actions {
+                display: flex;
+                gap: 0.75em;
+            }
             #censoredLyricsConfigurationPage #runStatus:empty {
                 display: none;
             }
             #censoredLyricsConfigurationPage #runStatus {
-                margin-top: 0.75em;
+                margin: 0 0 1em;
             }
         </style>
         <div data-role="content">
             <div class="content-primary">
-                <textarea id="words" is="emby-textarea" class="emby-textarea" spellcheck="false"></textarea>
-                <div id="styles" class="choices"></div>
-                <div id="masks" class="choices"></div>
-                <details>
-                    <summary>Advanced</summary>
-                    <button is="emby-button" type="button" id="forceButton" class="raised">
-                        <span>Force Refresh all Lyrics</span>
-                    </button>
-                </details>
-                <div id="runStatus"></div>
-                <div class="actions">
-                    <button is="emby-button" type="button" id="applyButton" class="raised button-submit">
-                        <span>Apply</span>
-                    </button>
-                    <button is="emby-button" type="button" id="saveButton" class="raised">
-                        <span>Save</span>
-                    </button>
-                </div>
+                <form class="configForm">
+                    <div class="inputContainer">
+                        <textarea is="emby-textarea" id="words" label="Words" spellcheck="false"></textarea>
+                    </div>
+                    <div class="selectContainer">
+                        <select is="emby-select" id="style" label="Censor">
+                            <option value="None">beans</option>
+                            <option value="FirstLetter">b****</option>
+                            <option value="WholeWord">*****</option>
+                        </select>
+                    </div>
+                    <div class="selectContainer">
+                        <select is="emby-select" id="mask" label="Characters">
+                            <option value="Asterisk">* asterisks</option>
+                            <option value="Hash"># roblox</option>
+                            <option value="Symbols">@#? random symbols</option>
+                        </select>
+                    </div>
+                    <details>
+                        <summary>Advanced</summary>
+                        <button is="emby-button" type="button" id="forceButton" class="raised block emby-button">
+                            <span>Force Refresh all Lyrics</span>
+                        </button>
+                    </details>
+                    <div id="runStatus"></div>
+                    <div class="actions">
+                        <button is="emby-button" type="button" id="applyButton" class="raised button-submit emby-button">
+                            <span>Apply</span>
+                        </button>
+                        <button is="emby-button" type="button" id="saveButton" class="raised emby-button">
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
         <script type="text/javascript">
@@ -90,52 +93,11 @@
                     return text;
                 },
 
-                selected: function (name, fallback) {
-                    var picked = document.querySelector("input[name='" + name + "']:checked");
-                    return picked ? picked.value : fallback;
-                },
-
-                renderChoices: function () {
-                    var mask = CensoredLyricsConfiguration.selected("mask", "Asterisk");
-                    var style = CensoredLyricsConfiguration.selected("style", "FirstLetter");
-                    var styles = [
-                        ["None", "None"],
-                        ["FirstLetter", "FirstLetter"],
-                        ["WholeWord", "WholeWord"]
-                    ];
-                    var styleBox = document.getElementById("styles");
-                    styleBox.innerHTML = "";
-                    styles.forEach(function (item) {
-                        var label = document.createElement("label");
-                        var input = document.createElement("input");
-                        input.type = "radio";
-                        input.name = "style";
-                        input.value = item[0];
-                        input.checked = item[0] === style;
-                        input.addEventListener("change", CensoredLyricsConfiguration.renderChoices);
-                        label.appendChild(input);
-                        label.appendChild(document.createTextNode(CensoredLyricsConfiguration.preview(item[0], mask)));
-                        styleBox.appendChild(label);
-                    });
-
-                    var masks = [
-                        ["Asterisk", "* asterisks"],
-                        ["Hash", "# roblox"],
-                        ["Symbols", "@#? random symbols"]
-                    ];
-                    var maskBox = document.getElementById("masks");
-                    maskBox.innerHTML = "";
-                    masks.forEach(function (item) {
-                        var label = document.createElement("label");
-                        var input = document.createElement("input");
-                        input.type = "radio";
-                        input.name = "mask";
-                        input.value = item[0];
-                        input.checked = item[0] === mask;
-                        input.addEventListener("change", CensoredLyricsConfiguration.renderChoices);
-                        label.appendChild(input);
-                        label.appendChild(document.createTextNode(item[1]));
-                        maskBox.appendChild(label);
+                refreshStyleLabels: function () {
+                    var mask = document.getElementById("mask").value || "Asterisk";
+                    ["None", "FirstLetter", "WholeWord"].forEach(function (style) {
+                        var option = document.querySelector("#style option[value='" + style + "']");
+                        if (option) option.textContent = CensoredLyricsConfiguration.preview(style, mask);
                     });
                 },
 
@@ -148,18 +110,16 @@
 
                 fill: function (config) {
                     document.getElementById("words").value = (config.Words || "").replace(/\r\n/g, "\n");
-                    var style = document.querySelector("input[name='style'][value='" + (config.Style || "FirstLetter") + "']");
-                    var mask = document.querySelector("input[name='mask'][value='" + (config.Mask || "Asterisk") + "']");
-                    if (style) style.checked = true;
-                    if (mask) mask.checked = true;
-                    CensoredLyricsConfiguration.renderChoices();
+                    document.getElementById("style").value = config.Style || "FirstLetter";
+                    document.getElementById("mask").value = config.Mask || "Asterisk";
+                    CensoredLyricsConfiguration.refreshStyleLabels();
                 },
 
                 save: function () {
                     return ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
                         config.Words = CensoredLyricsConfiguration.words().join("\n");
-                        config.Style = CensoredLyricsConfiguration.selected("style", "FirstLetter");
-                        config.Mask = CensoredLyricsConfiguration.selected("mask", "Asterisk");
+                        config.Style = document.getElementById("style").value || "FirstLetter";
+                        config.Mask = document.getElementById("mask").value || "Asterisk";
                         return ApiClient.updatePluginConfiguration(CensoredLyricsConfiguration.pluginId, config);
                     });
                 },
@@ -200,8 +160,9 @@
                 }
             };
 
+            document.getElementById("mask").addEventListener("change", CensoredLyricsConfiguration.refreshStyleLabels);
+
             document.getElementById("censoredLyricsConfigurationPage").addEventListener("pageshow", function () {
-                CensoredLyricsConfiguration.renderChoices();
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
                     CensoredLyricsConfiguration.fill(config);
