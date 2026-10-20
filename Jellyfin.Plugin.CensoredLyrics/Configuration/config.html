@@ -42,12 +42,6 @@
                 background: #757575;
                 color: #fff;
             }
-            #censoredLyricsConfigurationPage #runStatus:empty {
-                display: none;
-            }
-            #censoredLyricsConfigurationPage #runStatus {
-                margin: 0 0 1em;
-            }
         </style>
         <div data-role="content">
             <div class="content-primary">
@@ -83,7 +77,6 @@
                         </button>
                         <div class="fieldDescription">Downloads every song again and overwrites its lyrics.</div>
                     </details>
-                    <div id="runStatus"></div>
                     <div class="actions">
                         <button is="emby-button" type="button" id="saveButton" class="raised button-submit block emby-button">
                             <span>Save</span>
@@ -92,14 +85,13 @@
                             <span>Apply</span>
                         </button>
                     </div>
-                    <div class="fieldDescription">Apply saves and fetches lyrics that are not cached yet. Save only stores these settings. Scheduled Tasks runs the same fetch every day at 2:00 AM.</div>
+                    <div class="fieldDescription">Apply saves, then starts the Jellyfin task. Save only stores these settings. Fetch censored lyrics runs every day at 2:00 AM under Scheduled Tasks.</div>
                 </form>
             </div>
         </div>
         <script type="text/javascript">
             var CensoredLyricsConfiguration = {
                 pluginId: "d045e257-f274-46e5-a2a7-b88f72c725e9",
-                pollTimer: 0,
 
                 alphabet: function (mask) {
                     if (mask === "Hash") return "#";
@@ -164,34 +156,8 @@
                     return CensoredLyricsConfiguration.save().then(function () {
                         return ApiClient.ajax({
                             type: "POST",
-                            url: ApiClient.getUrl("CensoredLyrics/Run", { force: force }),
-                            dataType: "json"
+                            url: ApiClient.getUrl("CensoredLyrics/Run", { force: force })
                         });
-                    }).then(function () {
-                        CensoredLyricsConfiguration.poll();
-                    }, function () {
-                        CensoredLyricsConfiguration.poll();
-                    });
-                },
-
-                poll: function () {
-                    if (CensoredLyricsConfiguration.pollTimer) {
-                        clearTimeout(CensoredLyricsConfiguration.pollTimer);
-                        CensoredLyricsConfiguration.pollTimer = 0;
-                    }
-                    ApiClient.getJSON(ApiClient.getUrl("CensoredLyrics/Status")).then(function (status) {
-                        var el = document.getElementById("runStatus");
-                        if (!el) return;
-                        if (status.Error) el.textContent = status.Error;
-                        else if (status.Total) el.textContent = status.Processed + " / " + status.Total;
-                        else el.textContent = "";
-                        ["applyButton", "saveButton", "forceButton"].forEach(function (id) {
-                            var button = document.getElementById(id);
-                            if (button) button.disabled = !!status.Running;
-                        });
-                        if (status.Running) {
-                            CensoredLyricsConfiguration.pollTimer = setTimeout(CensoredLyricsConfiguration.poll, 1000);
-                        }
                     });
                 }
             };
@@ -203,7 +169,6 @@
                 ApiClient.getPluginConfiguration(CensoredLyricsConfiguration.pluginId).then(function (config) {
                     CensoredLyricsConfiguration.fill(config);
                     Dashboard.hideLoadingMsg();
-                    CensoredLyricsConfiguration.poll();
                 });
             });
 

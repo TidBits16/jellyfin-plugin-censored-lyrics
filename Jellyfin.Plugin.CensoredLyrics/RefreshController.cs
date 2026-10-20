@@ -1,51 +1,47 @@
 using MediaBrowser.Common.Api;
+using MediaBrowser.Model.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jellyfin.Plugin.CensoredLyrics;
 
 /// <summary>
-/// Starts a library lyric refresh from the plugin settings page.
+/// Queues the Jellyfin lyric tasks from the plugin settings page.
 /// </summary>
 [ApiController]
 [Authorize(Policy = Policies.RequiresElevation)]
 [Route("CensoredLyrics")]
 public sealed class RefreshController : ControllerBase
 {
-    private readonly LyricRefreshService _refresh;
+    private readonly ITaskManager _tasks;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RefreshController"/> class.
     /// </summary>
-    /// <param name="refresh">Refresh service.</param>
-    public RefreshController(LyricRefreshService refresh)
+    /// <param name="tasks">Jellyfin task manager.</param>
+    public RefreshController(ITaskManager tasks)
     {
-        _refresh = refresh;
+        _tasks = tasks;
     }
 
     /// <summary>
-    /// Starts a refresh. Songs already fetched are skipped unless <paramref name="force"/> is true.
+    /// Queues a Jellyfin scheduled task. Songs already fetched are skipped unless <paramref name="force"/> is true.
     /// </summary>
-    /// <param name="force">True to fetch every song again and overwrite its lyrics.</param>
-    /// <returns>202 when the refresh starts, or 409 when one is already running.</returns>
+    /// <param name="force">True to queue the overwrite task.</param>
+    /// <returns>202 when the task is queued.</returns>
     [HttpPost("Run")]
     public IActionResult Run([FromQuery] bool force = false)
     {
-        if (!_refresh.TryStart(force))
+        if (force)
         {
-            return Conflict(GetStatus());
+            _tasks.CancelIfRunning<LyricRefreshTask>();
+            _tasks.QueueScheduledTask<LyricForceRefreshTask>();
+        }
+        else
+        {
+            _tasks.QueueIfNotRunning<LyricRefreshTask>();
         }
 
-        return Accepted(GetStatus());
-    }
-
-    /// <summary>
-    /// Gets refresh progress.
-    /// </summary>
-    /// <returns>The current status.</returns>
-    [HttpGet("Status")]
-    public ActionResult<RefreshStatus> GetStatus()
-    {
-        return _refresh.GetStatus();
+        return Accepted();
     }
 }

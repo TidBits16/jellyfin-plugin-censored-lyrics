@@ -18,9 +18,7 @@ public sealed class LyricRefreshService
     private readonly ILyricManager _lyricManager;
     private readonly LyricLookup _lookup;
     private readonly ILogger<LyricRefreshService> _logger;
-    private readonly object _gate = new();
     private int _running;
-    private RefreshStatus _status = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LyricRefreshService"/> class.
@@ -42,42 +40,7 @@ public sealed class LyricRefreshService
     }
 
     /// <summary>
-    /// Gets a snapshot of the current refresh.
-    /// </summary>
-    /// <returns>The current status.</returns>
-    public RefreshStatus GetStatus()
-    {
-        lock (_gate)
-        {
-            return new RefreshStatus
-            {
-                Running = _status.Running,
-                Processed = _status.Processed,
-                Total = _status.Total,
-                Written = _status.Written,
-                Error = _status.Error
-            };
-        }
-    }
-
-    /// <summary>
-    /// Starts a refresh if one is not already running.
-    /// </summary>
-    /// <param name="force">True to fetch every song again and overwrite its lyrics.</param>
-    /// <returns>False when a refresh is already running.</returns>
-    public bool TryStart(bool force)
-    {
-        if (!Begin())
-        {
-            return false;
-        }
-
-        _ = Task.Run(() => FinishAsync(force, null, CancellationToken.None));
-        return true;
-    }
-
-    /// <summary>
-    /// Runs a refresh and reports progress. Songs already fetched are skipped unless <paramref name="force"/> is true.
+    /// Runs a refresh and reports progress to the Jellyfin task. Songs already fetched are skipped unless <paramref name="force"/> is true.
     /// </summary>
     /// <param name="force">True to fetch every song again and overwrite its lyrics.</param>
     /// <param name="progress">Progress from 0 to 100.</param>
@@ -85,9 +48,9 @@ public sealed class LyricRefreshService
     /// <returns>A task that completes when the refresh finishes.</returns>
     public async Task ExecuteAsync(bool force, IProgress<double>? progress, CancellationToken cancellationToken)
     {
-        if (!Begin())
+        while (!Begin())
         {
-            return;
+            await Task.Delay(250, cancellationToken).ConfigureAwait(false);
         }
 
         await FinishAsync(force, progress, cancellationToken).ConfigureAwait(false);
@@ -95,17 +58,7 @@ public sealed class LyricRefreshService
 
     private bool Begin()
     {
-        if (Interlocked.CompareExchange(ref _running, 1, 0) != 0)
-        {
-            return false;
-        }
-
-        lock (_gate)
-        {
-            _status = new RefreshStatus { Running = true };
-        }
-
-        return true;
+        return Interlocked.CompareExchange(ref _running, 1, 0) == 0;
     }
 
     private async Task FinishAsync(bool force, IProgress<double>? progress, CancellationToken cancellationToken)
@@ -116,11 +69,6 @@ public sealed class LyricRefreshService
         }
         finally
         {
-            lock (_gate)
-            {
-                _status.Running = false;
-            }
-
             Interlocked.Exchange(ref _running, 0);
         }
     }
@@ -132,7 +80,7 @@ public sealed class LyricRefreshService
             var plugin = CensoredLyricsPlugin.Instance;
             if (plugin is null)
             {
-                SetError("Plugin is not loaded.");
+                _logger.LogError("Lyric refresh failed because the plugin is not loaded");
                 return;
             }
 
@@ -149,11 +97,6 @@ public sealed class LyricRefreshService
                 IsVirtualItem = false
             }).OfType<Audio>().ToList();
 
-            lock (_gate)
-            {
-                _status.Total = songs.Count;
-            }
-
             var processed = 0;
             progress?.Report(songs.Count == 0 ? 100 : 0);
             foreach (var song in songs)
@@ -161,13 +104,7 @@ public sealed class LyricRefreshService
                 cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
-                    if (await RefreshSongAsync(song, cache, censor, configuration, fingerprint, force, cancellationToken).ConfigureAwait(false))
-                    {
-                        lock (_gate)
-                        {
-                            _status.Written++;
-                        }
-                    }
+                    await RefreshSongAsync(song, cache, censor, configuration, fingerprint, force, cancellationToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {
@@ -179,11 +116,6 @@ public sealed class LyricRefreshService
                 }
 
                 processed++;
-                lock (_gate)
-                {
-                    _status.Processed = processed;
-                }
-
                 if (songs.Count > 0)
                 {
                     progress?.Report(100d * processed / songs.Count);
@@ -197,7 +129,6 @@ public sealed class LyricRefreshService
         catch (Exception exception)
         {
             _logger.LogError(exception, "Lyric refresh failed");
-            SetError(exception.Message);
         }
     }
 
@@ -298,13 +229,5 @@ public sealed class LyricRefreshService
     private static string Fingerprint(PluginConfiguration configuration)
     {
         return string.Join('\n', configuration.GetStyle(), configuration.GetMask(), configuration.Words ?? string.Empty);
-    }
-
-    private void SetError(string message)
-    {
-        lock (_gate)
-        {
-            _status.Error = message;
-        }
     }
 }
