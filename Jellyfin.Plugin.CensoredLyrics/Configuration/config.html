@@ -53,14 +53,14 @@
                     <div class="selectContainer">
                         <select is="emby-select" id="style" label="Censor">
                             <option value="None">shoot - Nothing</option>
-                            <option value="FirstLetter">s**** - All but first letter</option>
+                            <option value="FirstLetter" selected>s**** - All but first letter</option>
                             <option value="WholeWord">***** - Whole word</option>
                         </select>
                     </div>
                     <div class="fieldDescription">How much of a word to cover.</div>
                     <div class="selectContainer">
                         <select is="emby-select" id="mask" label="Characters">
-                            <option value="Asterisk">* asterisks</option>
+                            <option value="Asterisk" selected>* asterisks</option>
                             <option value="Hash"># roblox</option>
                             <option value="Symbols">@#? random symbols</option>
                             <option value="Hyphen">- hyphen</option>
@@ -89,7 +89,7 @@
                             <span>Apply</span>
                         </button>
                     </div>
-                    <div class="fieldDescription">Apply saves and fetches lyrics that are not cached yet. Save only stores these settings.</div>
+                    <div class="fieldDescription">Apply saves and fetches lyrics that are not cached yet. Save only stores these settings. Scheduled Tasks runs the same fetch every day at 3:00.</div>
                 </form>
             </div>
         </div>

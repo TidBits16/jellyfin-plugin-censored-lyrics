@@ -67,6 +67,34 @@ public sealed class LyricRefreshService
     /// <returns>False when a refresh is already running.</returns>
     public bool TryStart(bool force)
     {
+        if (!Begin())
+        {
+            return false;
+        }
+
+        _ = Task.Run(() => FinishAsync(force, null, CancellationToken.None));
+        return true;
+    }
+
+    /// <summary>
+    /// Runs a refresh and reports progress. Songs already fetched are skipped unless <paramref name="force"/> is true.
+    /// </summary>
+    /// <param name="force">True to fetch every song again and overwrite its lyrics.</param>
+    /// <param name="progress">Progress from 0 to 100.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A task that completes when the refresh finishes.</returns>
+    public async Task ExecuteAsync(bool force, IProgress<double>? progress, CancellationToken cancellationToken)
+    {
+        if (!Begin())
+        {
+            return;
+        }
+
+        await FinishAsync(force, progress, cancellationToken).ConfigureAwait(false);
+    }
+
+    private bool Begin()
+    {
         if (Interlocked.CompareExchange(ref _running, 1, 0) != 0)
         {
             return false;
@@ -77,11 +105,27 @@ public sealed class LyricRefreshService
             _status = new RefreshStatus { Running = true };
         }
 
-        _ = Task.Run(() => RunAsync(force));
         return true;
     }
 
-    private async Task RunAsync(bool force)
+    private async Task FinishAsync(bool force, IProgress<double>? progress, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await RunAsync(force, progress, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            lock (_gate)
+            {
+                _status.Running = false;
+            }
+
+            Interlocked.Exchange(ref _running, 0);
+        }
+    }
+
+    private async Task RunAsync(bool force, IProgress<double>? progress, CancellationToken cancellationToken)
     {
         try
         {
@@ -110,11 +154,14 @@ public sealed class LyricRefreshService
                 _status.Total = songs.Count;
             }
 
+            var processed = 0;
+            progress?.Report(songs.Count == 0 ? 100 : 0);
             foreach (var song in songs)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
-                    if (await RefreshSongAsync(song, cache, censor, configuration, fingerprint, force, CancellationToken.None).ConfigureAwait(false))
+                    if (await RefreshSongAsync(song, cache, censor, configuration, fingerprint, force, cancellationToken).ConfigureAwait(false))
                     {
                         lock (_gate)
                         {
@@ -122,30 +169,35 @@ public sealed class LyricRefreshService
                         }
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (Exception exception)
                 {
                     _logger.LogWarning(exception, "Failed to refresh lyrics for {Song}", song.Name);
                 }
 
+                processed++;
                 lock (_gate)
                 {
-                    _status.Processed++;
+                    _status.Processed = processed;
+                }
+
+                if (songs.Count > 0)
+                {
+                    progress?.Report(100d * processed / songs.Count);
                 }
             }
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Lyric refresh failed");
             SetError(exception.Message);
-        }
-        finally
-        {
-            lock (_gate)
-            {
-                _status.Running = false;
-            }
-
-            Interlocked.Exchange(ref _running, 0);
         }
     }
 
