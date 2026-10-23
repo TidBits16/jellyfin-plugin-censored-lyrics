@@ -8,6 +8,22 @@
         "category": "Music",
         "versions": [
             {
+                "version": "1.0.29.0",
+                "changelog": "Jellyfin 12. The daily lyric scan is a DangerDrive scheduled task.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.29.0/censored-lyrics_1.0.29.0.zip",
+                "checksum": "a7a508df304b45f1d599f2ca6c020f8a",
+                "timestamp": "2026-10-23T15:07:02Z"
+            },
+            {
+                "version": "1.0.28.0",
+                "changelog": "Jellyfin 10.11. The daily lyric scan is a DangerDrive scheduled task.",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.29.0/censored-lyrics_1.0.28.0.zip",
+                "checksum": "fb6f488988cfe14efe15d26dd5ebbc79",
+                "timestamp": "2026-10-23T15:07:02Z"
+            },
+            {
                 "version": "1.0.27.0",
                 "changelog": "Jellyfin 12. Lyric downloads run as Jellyfin scheduled tasks.",
                 "targetAbi": "12.0.0.0",

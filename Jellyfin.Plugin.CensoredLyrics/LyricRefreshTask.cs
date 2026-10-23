@@ -28,7 +28,7 @@ public sealed class LyricRefreshTask : IScheduledTask
     public string Description => "Fetches lyrics for songs that have not been fetched yet, then censors them.";
 
     /// <inheritdoc />
-    public string Category => "Censored LRCLIB";
+    public string Category => "DangerDrive";
 
     /// <inheritdoc />
     public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()

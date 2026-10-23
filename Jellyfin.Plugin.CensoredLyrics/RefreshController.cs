@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Jellyfin.Plugin.CensoredLyrics;
 
 /// <summary>
-/// Queues the Jellyfin lyric tasks from the plugin settings page.
+/// Starts a lyric fetch from the plugin settings page.
 /// </summary>
 [ApiController]
 [Authorize(Policy = Policies.RequiresElevation)]
@@ -14,28 +14,31 @@ namespace Jellyfin.Plugin.CensoredLyrics;
 public sealed class RefreshController : ControllerBase
 {
     private readonly ITaskManager _tasks;
+    private readonly LyricRefreshService _refresh;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RefreshController"/> class.
     /// </summary>
     /// <param name="tasks">Jellyfin task manager.</param>
-    public RefreshController(ITaskManager tasks)
+    /// <param name="refresh">Refresh service used by the overwrite button.</param>
+    public RefreshController(ITaskManager tasks, LyricRefreshService refresh)
     {
         _tasks = tasks;
+        _refresh = refresh;
     }
 
     /// <summary>
-    /// Queues a Jellyfin scheduled task. Songs already fetched are skipped unless <paramref name="force"/> is true.
+    /// Queues the daily Jellyfin task, or overwrites every song when <paramref name="force"/> is true.
     /// </summary>
-    /// <param name="force">True to queue the overwrite task.</param>
-    /// <returns>202 when the task is queued.</returns>
+    /// <param name="force">True to download every song again outside the scheduled task.</param>
+    /// <returns>202 when the work is queued.</returns>
     [HttpPost("Run")]
     public IActionResult Run([FromQuery] bool force = false)
     {
         if (force)
         {
             _tasks.CancelIfRunning<LyricRefreshTask>();
-            _tasks.QueueScheduledTask<LyricForceRefreshTask>();
+            _ = Task.Run(() => _refresh.ExecuteAsync(true, null, CancellationToken.None));
         }
         else
         {
