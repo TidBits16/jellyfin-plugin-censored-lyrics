@@ -26,10 +26,10 @@ public sealed class CensoredLyricsPlugin : BasePlugin<PluginConfiguration>, IHas
         : base(applicationPaths, xmlSerializer)
     {
         Instance = this;
-        if (Configuration.WordListVersion < 4)
+        if (Configuration.WordListVersion < 5)
         {
             Configuration.Words = ProfanityCatalog.DefaultWordText;
-            Configuration.WordListVersion = 4;
+            Configuration.WordListVersion = 5;
             SaveConfiguration();
         }
     }
