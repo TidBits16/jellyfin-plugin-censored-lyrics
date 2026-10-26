@@ -1,3 +1,4 @@
+using Jellyfin.Plugin.CensoredLyrics.Censor;
 using Jellyfin.Plugin.CensoredLyrics.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
@@ -25,6 +26,12 @@ public sealed class CensoredLyricsPlugin : BasePlugin<PluginConfiguration>, IHas
         : base(applicationPaths, xmlSerializer)
     {
         Instance = this;
+        if (Configuration.WordListVersion < 2)
+        {
+            Configuration.Words = ProfanityCatalog.DefaultWordText;
+            Configuration.WordListVersion = 2;
+            SaveConfiguration();
+        }
     }
 
     /// <summary>

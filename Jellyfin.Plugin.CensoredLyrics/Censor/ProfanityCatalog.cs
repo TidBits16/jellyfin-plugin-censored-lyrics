@@ -8,7 +8,6 @@ namespace Jellyfin.Plugin.CensoredLyrics.Censor;
 public static class ProfanityCatalog
 {
     private const string StrongResource = "Jellyfin.Plugin.CensoredLyrics.profanity.txt";
-    private const string MildResource = "Jellyfin.Plugin.CensoredLyrics.profanity-mild.txt";
 
     private static readonly object CacheGate = new();
     private static string? _cacheKey;
@@ -17,9 +16,7 @@ public static class ProfanityCatalog
     /// <summary>
     /// Gets the starting word list, one word per line.
     /// </summary>
-    public static string DefaultWordText { get; } = string.Join(
-        '\n',
-        Load(StrongResource).Concat(Load(MildResource)).Distinct(StringComparer.OrdinalIgnoreCase).Order(StringComparer.OrdinalIgnoreCase));
+    public static string DefaultWordText { get; } = string.Join('\n', Load(StrongResource));
 
     /// <summary>
     /// Creates a censor from an explicit word list.

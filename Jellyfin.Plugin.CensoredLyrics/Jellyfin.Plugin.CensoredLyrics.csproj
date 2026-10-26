@@ -7,8 +7,8 @@
     <RootNamespace>Jellyfin.Plugin.CensoredLyrics</RootNamespace>
     <AssemblyName>Jellyfin.Plugin.CensoredLyrics</AssemblyName>
     <GenerateDependencyFile>false</GenerateDependencyFile>
-    <Version Condition="'$(TargetFramework)' == 'net9.0'">1.0.30.0</Version>
-    <Version Condition="'$(TargetFramework)' == 'net10.0'">1.0.31.0</Version>
+    <Version Condition="'$(TargetFramework)' == 'net9.0'">1.0.32.0</Version>
+    <Version Condition="'$(TargetFramework)' == 'net10.0'">1.0.33.0</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
@@ -21,9 +21,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Censor\profanity.txt">
       <LogicalName>Jellyfin.Plugin.CensoredLyrics.profanity.txt</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Censor\profanity-mild.txt">
-      <LogicalName>Jellyfin.Plugin.CensoredLyrics.profanity-mild.txt</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Configuration\config.html">
       <LogicalName>Jellyfin.Plugin.CensoredLyrics.Configuration.config.html</LogicalName>

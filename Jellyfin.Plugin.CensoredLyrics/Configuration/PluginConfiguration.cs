@@ -18,6 +18,11 @@ public class PluginConfiguration : BasePluginConfiguration
     public string Words { get; set; } = Censor.ProfanityCatalog.DefaultWordText;
 
     /// <summary>
+    /// Gets or sets which built-in word list is saved. Older lists are replaced once.
+    /// </summary>
+    public int WordListVersion { get; set; }
+
+    /// <summary>
     /// Gets or sets how matched words are replaced.
     /// </summary>
     public string Style { get; set; } = CensorStyle.FirstLetter.ToString();

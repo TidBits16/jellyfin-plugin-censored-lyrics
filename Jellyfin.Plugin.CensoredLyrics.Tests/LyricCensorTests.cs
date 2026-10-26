@@ -19,8 +19,11 @@ public class LyricCensorTests
         Assert.Equal("f***", censor.Censor("fuck"));
         Assert.Equal("F***", censor.Censor("Fuck"));
         Assert.Equal("F***", censor.Censor("FUCK"));
-        Assert.Equal("fucking", censor.Censor("fucking"));
-        Assert.Equal("m***********", censor.Censor("motherfucker"));
+        Assert.Equal("f******", censor.Censor("fucking"));
+        Assert.Equal("f*****", censor.Censor("fucker"));
+        Assert.Equal("f*****", censor.Censor("fucked"));
+        Assert.Equal("f*****", censor.Censor("fuckin"));
+        Assert.Equal("motherfucker", censor.Censor("motherfucker"));
     }
 
     [Fact]
@@ -83,14 +86,15 @@ public class LyricCensorTests
 
         Assert.Equal("s***!", censor.Censor("shit!"));
         Assert.Equal("a**", censor.Censor("ass"));
-        Assert.Equal("a******", censor.Censor("asshole"));
+        Assert.Equal("asshole", censor.Censor("asshole"));
         Assert.Equal("s***", censor.Censor("sh1t"));
         Assert.Equal("a**", censor.Censor("a$$"));
         Assert.Equal("@**", censor.Censor("@ss"));
-        Assert.Equal("fuckin'", censor.Censor("fuckin'"));
-        Assert.Equal("bitches", censor.Censor("bitches"));
+        Assert.Equal("f*****'", censor.Censor("fuckin'"));
+        Assert.Equal("b******", censor.Censor("bitches"));
+        Assert.Equal("d*****", censor.Censor("damned"));
         Assert.Equal("fuuuck", censor.Censor("fuuuck"));
-        Assert.Equal("asss", censor.Censor("asss"));
+        Assert.Equal("a***", censor.Censor("asss"));
     }
 
     [Fact]
@@ -100,8 +104,7 @@ public class LyricCensorTests
 
         Assert.Equal("b****", censor.Censor("beans"));
         Assert.Equal("fuck", censor.Censor("fuck"));
-        Assert.Contains("ass", ProfanityCatalog.DefaultWordText.Split('\n'));
-        Assert.Contains("fuck", ProfanityCatalog.DefaultWordText.Split('\n'));
+        Assert.Equal(["fuck", "shit", "ass", "damn", "nigger", "nigga", "bitch"], ProfanityCatalog.DefaultWordText.Split('\n'));
     }
 
     [Fact]
@@ -127,7 +130,6 @@ public class LyricCensorTests
         var names = typeof(ProfanityCatalog).Assembly.GetManifestResourceNames();
 
         Assert.Contains("Jellyfin.Plugin.CensoredLyrics.profanity.txt", names);
-        Assert.Contains("Jellyfin.Plugin.CensoredLyrics.profanity-mild.txt", names);
         Assert.Contains("Jellyfin.Plugin.CensoredLyrics.Configuration.config.html", names);
     }
 }

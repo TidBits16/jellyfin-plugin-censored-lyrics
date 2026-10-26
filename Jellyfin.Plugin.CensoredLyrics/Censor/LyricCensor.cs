@@ -10,6 +10,8 @@ namespace Jellyfin.Plugin.CensoredLyrics.Censor;
 /// </summary>
 public sealed partial class LyricCensor
 {
+    private static readonly string[] Suffixes = ["ers", "ing", "es", "ed", "er", "in", "s"];
+
     private readonly HashSet<string> _banned;
     private readonly CensorStyle _style;
     private readonly MaskCharacters _mask;
@@ -124,7 +126,30 @@ public sealed partial class LyricCensor
             return false;
         }
 
-        return _banned.Contains(normalized);
+        return Matches(normalized);
+    }
+
+    private bool Matches(string word)
+    {
+        if (_banned.Contains(word))
+        {
+            return true;
+        }
+
+        foreach (var suffix in Suffixes)
+        {
+            if (word.Length <= suffix.Length + 2 || !word.EndsWith(suffix, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (_banned.Contains(word[..^suffix.Length]))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static HashSet<string> NormalizeAll(IEnumerable<string> words)
