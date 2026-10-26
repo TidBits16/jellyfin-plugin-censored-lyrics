@@ -9,6 +9,22 @@
         "imageUrl": "https://raw.githubusercontent.com/TidBits16/jellyfin-plugin-censored-lyrics/main/assets/logo.png",
         "versions": [
             {
+                "version": "1.0.57.0",
+                "changelog": "Jellyfin 12. Force refresh is a button that overwrites lyrics.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.57.0/censored-lyrics_1.0.57.0.zip",
+                "checksum": "1f7a25a08bbd694e85de62a994fd29c3",
+                "timestamp": "2026-10-26T18:23:50Z"
+            },
+            {
+                "version": "1.0.56.0",
+                "changelog": "Jellyfin 10.11. Force refresh is a button that overwrites lyrics.",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.57.0/censored-lyrics_1.0.56.0.zip",
+                "checksum": "1658c105360736d67fe53eefcc51e703",
+                "timestamp": "2026-10-26T18:23:50Z"
+            },
+            {
                 "version": "1.0.55.0",
                 "changelog": "Jellyfin 12. Centered lines and asterisks.",
                 "targetAbi": "12.0.0.0",

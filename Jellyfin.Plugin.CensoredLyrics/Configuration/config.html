@@ -65,18 +65,31 @@
             }
             #censoredLyricsConfigurationPage .collapseContent {
                 display: none;
-                padding-top: 1.1em;
+                height: 0;
+                overflow: hidden;
+                padding-top: 0;
             }
             #censoredLyricsConfigurationPage .collapseContent.expanded {
                 display: block;
+                height: auto !important;
+                overflow: visible;
+                padding-top: 1.1em;
             }
             #censoredLyricsConfigurationPage #forceButton {
+                display: block;
                 width: 100%;
-                min-height: 3.4em;
-                margin-top: 0.4em;
+                margin: 0.8em 0 0.2em;
+                padding: 0.9em 1em;
+                border: 0;
+                border-radius: 0.2em;
                 background: #c62828 !important;
                 color: #fff !important;
-                font-size: 1.15em;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+                font: inherit;
+                font-weight: 600;
+                line-height: 1.35;
+                text-align: center;
+                cursor: pointer;
             }
             #censoredLyricsConfigurationPage .actions {
                 display: flex;
@@ -123,7 +136,7 @@
                             <label class="selectLabel" for="words">Words</label>
                             <textarea id="words" class="wordList" spellcheck="false"></textarea>
                             <div class="fieldDescription">One word per line.</div>
-                            <button is="emby-button" type="button" id="forceButton" class="raised block emby-button">
+                            <button is="emby-button" type="button" id="forceButton" class="raised button-delete block emby-button">
                                 <span>Force Refresh all Lyrics</span>
                             </button>
                             <div class="fieldDescription">Downloads every song again and overwrites its lyrics.</div>
@@ -205,10 +218,12 @@
                 },
 
                 run: function (force) {
+                    var url = ApiClient.getUrl("CensoredLyrics/Run");
+                    if (force) url += "?force=true";
                     return CensoredLyricsConfiguration.save().then(function () {
                         return ApiClient.ajax({
                             type: "POST",
-                            url: ApiClient.getUrl("CensoredLyrics/Run", { force: force })
+                            url: url
                         });
                     });
                 }
@@ -241,8 +256,16 @@
                 this.querySelector(".emby-collapse-expandIcon").classList.toggle("emby-collapse-expandIconExpanded", open);
             });
 
-            document.getElementById("forceButton").addEventListener("click", function () {
-                CensoredLyricsConfiguration.run(true);
+            document.getElementById("forceButton").addEventListener("click", function (event) {
+                event.preventDefault();
+                Dashboard.showLoadingMsg();
+                CensoredLyricsConfiguration.run(true).then(function () {
+                    Dashboard.hideLoadingMsg();
+                    Dashboard.alert("Force refresh started. It runs under Scheduled Tasks and overwrites lyrics.");
+                }).catch(function () {
+                    Dashboard.hideLoadingMsg();
+                    Dashboard.alert("Force refresh could not start.");
+                });
             });
         </script>
     </div>

@@ -35,7 +35,7 @@ Jellyfin 12 installs the newest 12 build. Jellyfin 10.11 installs the newest 10.
 
 ## Use it
 
-Open **Dashboard → Plugins → Censored LRCLIB**. The default mask keeps the first letter and covers the rest with asterisks. **Apply** saves, then starts **Fetch censored lyrics**. **Save** only stores the settings. That task is under **Dashboard → Scheduled Tasks**, in the **DangerDrive** category, and runs every day at 2:00 AM. The word list and **Force Refresh all Lyrics** are under **Advanced**. Force refresh downloads every song again and overwrites its lyrics. It is not a scheduled task.
+Open **Dashboard → Plugins → Censored LRCLIB**. The default mask keeps the first letter and covers the rest with asterisks. **Apply** saves, then starts **Fetch censored lyrics**. **Save** only stores the settings. That task is under **Dashboard → Scheduled Tasks**, in the **DangerDrive** category, and runs every day at 2:00 AM. The word list and **Force Refresh all Lyrics** are under **Advanced**. Force refresh is the red button there. It starts **Fetch censored lyrics** and overwrites every song.
 
 ## Build
 

@@ -19,6 +19,7 @@ public sealed class LyricRefreshService
     private readonly LyricLookup _lookup;
     private readonly ILogger<LyricRefreshService> _logger;
     private int _running;
+    private int _forceRequested;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LyricRefreshService"/> class.
@@ -37,6 +38,23 @@ public sealed class LyricRefreshService
         _lyricManager = lyricManager;
         _lookup = lookup;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Marks the next scheduled run to download every song again.
+    /// </summary>
+    public void RequestForce()
+    {
+        Interlocked.Exchange(ref _forceRequested, 1);
+    }
+
+    /// <summary>
+    /// Returns whether the next run should overwrite lyrics, then clears that request.
+    /// </summary>
+    /// <returns>True when a force refresh was requested.</returns>
+    public bool ConsumeForce()
+    {
+        return Interlocked.Exchange(ref _forceRequested, 0) == 1;
     }
 
     /// <summary>

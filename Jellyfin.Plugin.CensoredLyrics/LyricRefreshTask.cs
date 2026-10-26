@@ -43,6 +43,6 @@ public sealed class LyricRefreshTask : IScheduledTask
     /// <inheritdoc />
     public Task ExecuteAsync(IProgress<double> progress, CancellationToken cancellationToken)
     {
-        return _refresh.ExecuteAsync(false, progress, cancellationToken);
+        return _refresh.ExecuteAsync(_refresh.ConsumeForce(), progress, cancellationToken);
     }
 }

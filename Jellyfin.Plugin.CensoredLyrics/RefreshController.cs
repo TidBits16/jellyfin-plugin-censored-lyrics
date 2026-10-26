@@ -30,15 +30,15 @@ public sealed class RefreshController : ControllerBase
     /// <summary>
     /// Queues the daily Jellyfin task, or overwrites every song when <paramref name="force"/> is true.
     /// </summary>
-    /// <param name="force">True to download every song again outside the scheduled task.</param>
+    /// <param name="force">True to download every song again on the scheduled task.</param>
     /// <returns>202 when the work is queued.</returns>
     [HttpPost("Run")]
     public IActionResult Run([FromQuery] bool force = false)
     {
         if (force)
         {
-            _tasks.CancelIfRunning<LyricRefreshTask>();
-            _ = Task.Run(() => _refresh.ExecuteAsync(true, null, CancellationToken.None));
+            _refresh.RequestForce();
+            _tasks.CancelIfRunningAndQueue<LyricRefreshTask>();
         }
         else
         {
