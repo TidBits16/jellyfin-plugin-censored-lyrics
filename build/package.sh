@@ -47,16 +47,16 @@ PY
   rm -rf "${stage}"
 }
 
-package_one net10.0 1.0.45.0 12.0.0.0 "Jellyfin 12. The default list includes faggot."
-package_one net9.0 1.0.44.0 10.11.0.0 "Jellyfin 10.11. The default list includes faggot."
+package_one net10.0 1.0.47.0 12.0.0.0 "Jellyfin 12. Trailing apostrophes stay, so bitchin' becomes b******'."
+package_one net9.0 1.0.46.0 10.11.0.0 "Jellyfin 10.11. Trailing apostrophes stay, so bitchin' becomes b******'."
 
 python3 - "${dist}" "${stamp}" <<'PY'
 import hashlib, json, pathlib, sys
 dist, stamp = sys.argv[1:]
-repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.45.0"
+repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.47.0"
 entries = [
-    ("1.0.45.0", "12.0.0.0", "Jellyfin 12. The default list includes faggot."),
-    ("1.0.44.0", "10.11.0.0", "Jellyfin 10.11. The default list includes faggot."),
+    ("1.0.47.0", "12.0.0.0", "Jellyfin 12. Trailing apostrophes stay, so bitchin' becomes b******'."),
+    ("1.0.46.0", "10.11.0.0", "Jellyfin 10.11. Trailing apostrophes stay, so bitchin' becomes b******'."),
 ]
 manifest_path = pathlib.Path(dist).parent / "manifest.json"
 previous = json.loads(manifest_path.read_text())[0]["versions"] if manifest_path.exists() else []

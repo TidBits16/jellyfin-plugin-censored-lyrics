@@ -91,6 +91,10 @@ public class LyricCensorTests
         Assert.Equal("a$$", censor.Censor("a$$"));
         Assert.Equal("@ss", censor.Censor("@ss"));
         Assert.Equal("f*****'", censor.Censor("fuckin'"));
+        Assert.Equal("b******'", censor.Censor("bitchin'"));
+        Assert.Equal("b******’", censor.Censor("bitchin’"));
+        Assert.Equal("*******'", Censor(CensorStyle.WholeWord).Censor("bitchin'"));
+        Assert.Equal("don't", censor.Censor("don't"));
         Assert.Equal("b*******", censor.Censor("bitching"));
         Assert.Equal("s******", censor.Censor("shitter"));
         Assert.Equal("d******", censor.Censor("damning"));

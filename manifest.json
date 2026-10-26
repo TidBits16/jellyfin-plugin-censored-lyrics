@@ -8,6 +8,22 @@
         "category": "Music",
         "versions": [
             {
+                "version": "1.0.47.0",
+                "changelog": "Jellyfin 12. Trailing apostrophes stay, so bitchin' becomes b******'.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.47.0/censored-lyrics_1.0.47.0.zip",
+                "checksum": "c4deb0006cc414b82b3a60129728c167",
+                "timestamp": "2026-10-26T16:23:20Z"
+            },
+            {
+                "version": "1.0.46.0",
+                "changelog": "Jellyfin 10.11. Trailing apostrophes stay, so bitchin' becomes b******'.",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.47.0/censored-lyrics_1.0.46.0.zip",
+                "checksum": "12efd4796a76279893d7087c0bc88bc5",
+                "timestamp": "2026-10-26T16:23:20Z"
+            },
+            {
                 "version": "1.0.45.0",
                 "changelog": "Jellyfin 12. The default list includes faggot.",
                 "targetAbi": "12.0.0.0",

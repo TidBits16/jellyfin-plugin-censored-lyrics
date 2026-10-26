@@ -75,21 +75,56 @@ public sealed partial class LyricCensor
 
         if (_mask == MaskCharacters.Brackets)
         {
-            var blanks = _style == CensorStyle.WholeWord ? token.Length : Math.Max(0, token.Length - 1);
+            var letters = token.Count(IsMaskedLetter);
+            var blanks = _style == CensorStyle.WholeWord ? letters : Math.Max(0, letters - 1);
             var inside = new string(' ', blanks);
+            var first = token.FirstOrDefault(IsMaskedLetter);
+            var trailing = token[LetterEnd(token)..];
             return _style == CensorStyle.WholeWord
-                ? "[" + inside + "]"
-                : token[0] + "[" + inside + "]";
+                ? "[" + inside + "]" + trailing
+                : first + "[" + inside + "]" + trailing;
         }
 
         var chars = token.ToCharArray();
-        var start = _style == CensorStyle.WholeWord ? 0 : 1;
-        for (var i = start; i < chars.Length; i++)
+        var started = _style == CensorStyle.WholeWord;
+        for (var i = 0; i < chars.Length; i++)
         {
+            if (!IsMaskedLetter(chars[i]))
+            {
+                continue;
+            }
+
+            if (!started)
+            {
+                started = true;
+                continue;
+            }
+
             chars[i] = MaskAt(token, i);
         }
 
         return new string(chars);
+    }
+
+    private static bool IsMaskedLetter(char character)
+    {
+        return !IsApostrophe(character);
+    }
+
+    private static bool IsApostrophe(char character)
+    {
+        return character is '\'' or '\u2018' or '\u2019' or '\u02BC' or '`' or '\u00B4';
+    }
+
+    private static int LetterEnd(string token)
+    {
+        var end = token.Length;
+        while (end > 0 && IsApostrophe(token[end - 1]))
+        {
+            end--;
+        }
+
+        return end;
     }
 
     private char MaskAt(string token, int index)
@@ -132,11 +167,12 @@ public sealed partial class LyricCensor
 
     private static string Normalize(string word)
     {
-        return word.ToLower(CultureInfo.InvariantCulture);
+        var lowered = word.ToLower(CultureInfo.InvariantCulture);
+        return lowered[..LetterEnd(lowered)];
     }
 
     [GeneratedRegex(
-        @"\[[^\]]*\]|<[^>]*>|(?<word>[\p{L}\d@$]+(?:['’][\p{L}\d@$]+)*)|[^\p{L}\d@$\[<]+",
+        @"\[[^\]]*\]|<[^>]*>|(?<word>[\p{L}\d@$]+(?:['’\u02BC][\p{L}\d@$]+)*['’\u02BC]*)|[^\p{L}\d@$\[<]+",
         RegexOptions.CultureInvariant)]
     private static partial Regex TokenPattern();
 }
