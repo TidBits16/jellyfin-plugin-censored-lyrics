@@ -9,6 +9,22 @@
         "imageUrl": "https://raw.githubusercontent.com/TidBits16/jellyfin-plugin-censored-lyrics/main/assets/logo.png",
         "versions": [
             {
+                "version": "1.0.51.0",
+                "changelog": "Jellyfin 12. Plugin image uses asterisks, not a letter.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.51.0/censored-lyrics_1.0.51.0.zip",
+                "checksum": "74c81f6a91a2556c54f09a5651afb798",
+                "timestamp": "2026-10-26T16:27:46Z"
+            },
+            {
+                "version": "1.0.50.0",
+                "changelog": "Jellyfin 10.11. Plugin image uses asterisks, not a letter.",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.51.0/censored-lyrics_1.0.50.0.zip",
+                "checksum": "a3470af41e85ebad128a833ff58b3bd1",
+                "timestamp": "2026-10-26T16:27:46Z"
+            },
+            {
                 "version": "1.0.49.0",
                 "changelog": "Jellyfin 12. Adds the plugin image.",
                 "targetAbi": "12.0.0.0",
