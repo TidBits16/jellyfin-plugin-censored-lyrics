@@ -4,7 +4,7 @@
     <title>Censored LRCLIB</title>
 </head>
 <body>
-    <div id="censoredLyricsConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-select,emby-textarea">
+    <div id="censoredLyricsConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-select">
         <style>
             #censoredLyricsConfigurationPage .intro {
                 margin: 0 0 1.5em;
@@ -15,8 +15,20 @@
             #censoredLyricsConfigurationPage .selectContainer .fieldDescription {
                 margin: 0.25em 0 0;
             }
-            #censoredLyricsConfigurationPage #words {
+            #censoredLyricsConfigurationPage .wordList {
+                display: block;
+                width: 100%;
                 min-height: 16em;
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0.6em 0.75em;
+                background: rgba(0, 0, 0, 0.28) !important;
+                color: inherit !important;
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                border-radius: 0.2em;
+                font: inherit;
+                line-height: 1.7;
+                resize: vertical;
             }
             #censoredLyricsConfigurationPage details {
                 margin: 0.5em 0 1.5em;
@@ -68,9 +80,8 @@
                     </div>
                     <details>
                         <summary>Advanced</summary>
-                        <div class="inputContainer">
-                            <textarea is="emby-textarea" id="words" label="Words" spellcheck="false"></textarea>
-                        </div>
+                        <label class="selectLabel" for="words">Words</label>
+                        <textarea id="words" class="wordList" spellcheck="false"></textarea>
                         <div class="fieldDescription">One word per line.</div>
                         <button is="emby-button" type="button" id="forceButton" class="raised block emby-button">
                             <span>Force Refresh all Lyrics</span>

@@ -47,16 +47,16 @@ PY
   rm -rf "${stage}"
 }
 
-package_one net10.0 1.0.29.0 12.0.0.0 "Jellyfin 12. The daily lyric scan is a DangerDrive scheduled task."
-package_one net9.0 1.0.28.0 10.11.0.0 "Jellyfin 10.11. The daily lyric scan is a DangerDrive scheduled task."
+package_one net10.0 1.0.31.0 12.0.0.0 "Jellyfin 12. The word list is a dark editable text box."
+package_one net9.0 1.0.30.0 10.11.0.0 "Jellyfin 10.11. The word list is a dark editable text box."
 
 python3 - "${dist}" "${stamp}" <<'PY'
 import hashlib, json, pathlib, sys
 dist, stamp = sys.argv[1:]
-repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.29.0"
+repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.31.0"
 entries = [
-    ("1.0.29.0", "12.0.0.0", "Jellyfin 12. The daily lyric scan is a DangerDrive scheduled task."),
-    ("1.0.28.0", "10.11.0.0", "Jellyfin 10.11. The daily lyric scan is a DangerDrive scheduled task."),
+    ("1.0.31.0", "12.0.0.0", "Jellyfin 12. The word list is a dark editable text box."),
+    ("1.0.30.0", "10.11.0.0", "Jellyfin 10.11. The word list is a dark editable text box."),
 ]
 manifest_path = pathlib.Path(dist).parent / "manifest.json"
 previous = json.loads(manifest_path.read_text())[0]["versions"] if manifest_path.exists() else []
