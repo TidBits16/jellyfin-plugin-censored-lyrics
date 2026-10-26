@@ -1,7 +1,7 @@
 # Censored LRCLIB
 
 <p align="center">
-  <img src="assets/logo.svg" width="220" alt="Censored LRCLIB">
+  <img src="assets/banner.svg" width="1000" alt="Censored LRCLIB">
 </p>
 
 Jellyfin plugin that downloads **timed lyrics from [LRCLIB](https://lrclib.net)** and censors swear words before Jellyfin saves them.
