@@ -30,17 +30,53 @@
                 line-height: 1.7;
                 resize: vertical;
             }
-            #censoredLyricsConfigurationPage details {
+            #censoredLyricsConfigurationPage .emby-collapse {
                 margin: 0.5em 0 1.5em;
             }
-            #censoredLyricsConfigurationPage summary {
+            #censoredLyricsConfigurationPage .emby-collapsible-button {
+                position: relative;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                margin: 0;
+                padding: 0.85em 2em 0.85em 0.1em;
+                background: transparent;
+                color: inherit;
+                border: 0;
+                border-bottom: 0.1em solid rgba(255, 255, 255, 0.2);
+                box-shadow: none;
+                text-align: left;
+                text-transform: none;
                 cursor: pointer;
+            }
+            #censoredLyricsConfigurationPage .emby-collapsible-title {
+                margin: 0;
                 font-size: 1.15em;
-                padding: 0.75em 0;
+                font-weight: 500;
+            }
+            #censoredLyricsConfigurationPage .emby-collapse-expandIcon {
+                position: absolute;
+                right: 0.2em;
+                font-size: 1.6em;
+                transition: transform 180ms ease-out;
+            }
+            #censoredLyricsConfigurationPage .emby-collapse-expandIconExpanded {
+                transform: rotate(180deg);
+            }
+            #censoredLyricsConfigurationPage .collapseContent {
+                display: none;
+                padding-top: 1.1em;
+            }
+            #censoredLyricsConfigurationPage .collapseContent.expanded {
+                display: block;
             }
             #censoredLyricsConfigurationPage #forceButton {
-                background: #c62828;
-                color: #fff;
+                width: 100%;
+                min-height: 3.4em;
+                margin-top: 0.4em;
+                background: #c62828 !important;
+                color: #fff !important;
+                font-size: 1.15em;
             }
             #censoredLyricsConfigurationPage .actions {
                 display: flex;
@@ -78,16 +114,21 @@
                         </select>
                         <div class="fieldDescription">What replaces the covered letters.</div>
                     </div>
-                    <details>
-                        <summary>Advanced</summary>
-                        <label class="selectLabel" for="words">Words</label>
-                        <textarea id="words" class="wordList" spellcheck="false"></textarea>
-                        <div class="fieldDescription">One word per line. Endings like -ing, -er, and -ed are included.</div>
-                        <button is="emby-button" type="button" id="forceButton" class="raised block emby-button">
-                            <span>Force Refresh all Lyrics</span>
+                    <div class="emby-collapse">
+                        <button type="button" id="advancedButton" class="emby-collapsible-button">
+                            <h3 class="emby-collapsible-title">Advanced</h3>
+                            <span class="material-icons emby-collapse-expandIcon" aria-hidden="true">expand_more</span>
                         </button>
-                        <div class="fieldDescription">Downloads every song again and overwrites its lyrics.</div>
-                    </details>
+                        <div id="advancedContent" class="collapseContent">
+                            <label class="selectLabel" for="words">Words</label>
+                            <textarea id="words" class="wordList" spellcheck="false"></textarea>
+                            <div class="fieldDescription">One word per line. Endings like -ing, -er, and -ed are included.</div>
+                            <button is="emby-button" type="button" id="forceButton" class="raised block emby-button">
+                                <span>Force Refresh all Lyrics</span>
+                            </button>
+                            <div class="fieldDescription">Downloads every song again and overwrites its lyrics.</div>
+                        </div>
+                    </div>
                     <div class="actions">
                         <button is="emby-button" type="button" id="saveButton" class="raised button-submit block emby-button">
                             <span>Save</span>
@@ -192,6 +233,12 @@
 
             document.getElementById("applyButton").addEventListener("click", function () {
                 CensoredLyricsConfiguration.run(false);
+            });
+
+            document.getElementById("advancedButton").addEventListener("click", function () {
+                var content = document.getElementById("advancedContent");
+                var open = content.classList.toggle("expanded");
+                this.querySelector(".emby-collapse-expandIcon").classList.toggle("emby-collapse-expandIconExpanded", open);
             });
 
             document.getElementById("forceButton").addEventListener("click", function () {

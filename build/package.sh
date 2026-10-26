@@ -47,16 +47,16 @@ PY
   rm -rf "${stage}"
 }
 
-package_one net10.0 1.0.33.0 12.0.0.0 "Jellyfin 12. The default list is the main words, including common endings."
-package_one net9.0 1.0.32.0 10.11.0.0 "Jellyfin 10.11. The default list is the main words, including common endings."
+package_one net10.0 1.0.35.0 12.0.0.0 "Jellyfin 12. Advanced is a collapsible section with a large red refresh button."
+package_one net9.0 1.0.34.0 10.11.0.0 "Jellyfin 10.11. Advanced is a collapsible section with a large red refresh button."
 
 python3 - "${dist}" "${stamp}" <<'PY'
 import hashlib, json, pathlib, sys
 dist, stamp = sys.argv[1:]
-repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.33.0"
+repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.35.0"
 entries = [
-    ("1.0.33.0", "12.0.0.0", "Jellyfin 12. The default list is the main words, including common endings."),
-    ("1.0.32.0", "10.11.0.0", "Jellyfin 10.11. The default list is the main words, including common endings."),
+    ("1.0.35.0", "12.0.0.0", "Jellyfin 12. Advanced is a collapsible section with a large red refresh button."),
+    ("1.0.34.0", "10.11.0.0", "Jellyfin 10.11. Advanced is a collapsible section with a large red refresh button."),
 ]
 manifest_path = pathlib.Path(dist).parent / "manifest.json"
 previous = json.loads(manifest_path.read_text())[0]["versions"] if manifest_path.exists() else []
