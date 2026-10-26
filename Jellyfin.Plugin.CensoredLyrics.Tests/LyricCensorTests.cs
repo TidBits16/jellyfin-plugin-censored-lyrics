@@ -21,8 +21,8 @@ public class LyricCensorTests
         Assert.Equal("F***", censor.Censor("FUCK"));
         Assert.Equal("f******", censor.Censor("fucking"));
         Assert.Equal("f*****", censor.Censor("fucker"));
-        Assert.Equal("f*****", censor.Censor("fucked"));
         Assert.Equal("f*****", censor.Censor("fuckin"));
+        Assert.Equal("fucked", censor.Censor("fucked"));
         Assert.Equal("motherfucker", censor.Censor("motherfucker"));
     }
 
@@ -91,10 +91,13 @@ public class LyricCensorTests
         Assert.Equal("a**", censor.Censor("a$$"));
         Assert.Equal("@**", censor.Censor("@ss"));
         Assert.Equal("f*****'", censor.Censor("fuckin'"));
-        Assert.Equal("b******", censor.Censor("bitches"));
-        Assert.Equal("d*****", censor.Censor("damned"));
+        Assert.Equal("b*******", censor.Censor("bitching"));
+        Assert.Equal("s******", censor.Censor("shitter"));
+        Assert.Equal("d******", censor.Censor("damning"));
+        Assert.Equal("bitches", censor.Censor("bitches"));
+        Assert.Equal("damned", censor.Censor("damned"));
         Assert.Equal("fuuuck", censor.Censor("fuuuck"));
-        Assert.Equal("a***", censor.Censor("asss"));
+        Assert.Equal("asss", censor.Censor("asss"));
     }
 
     [Fact]
@@ -104,7 +107,9 @@ public class LyricCensorTests
 
         Assert.Equal("b****", censor.Censor("beans"));
         Assert.Equal("fuck", censor.Censor("fuck"));
-        Assert.Equal(["fuck", "shit", "ass", "damn", "nigger", "nigga", "bitch"], ProfanityCatalog.DefaultWordText.Split('\n'));
+        Assert.Equal(
+            ["fuck", "fucker", "fucking", "fuckin", "shit", "shitter", "shitting", "shittin", "ass", "damn", "damning", "nigger", "nigga", "bitch", "bitching", "bitchin"],
+            ProfanityCatalog.DefaultWordText.Split('\n'));
     }
 
     [Fact]
