@@ -1,5 +1,9 @@
 # Censored LRCLIB
 
+<p align="center">
+  <img src="assets/logo.svg" width="220" alt="Censored LRCLIB">
+</p>
+
 Jellyfin plugin that downloads **timed lyrics from [LRCLIB](https://lrclib.net)** and censors swear words before Jellyfin saves them.
 
 `fuck` is stored as `f***`. The first letter stays, the rest of the word becomes asterisks, and the LRC timestamps stay put:
