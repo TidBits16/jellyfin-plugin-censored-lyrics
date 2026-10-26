@@ -111,7 +111,7 @@ public class LyricCensorTests
         Assert.Equal("be4ns", censor.Censor("be4ns"));
         Assert.Equal("fuck", censor.Censor("fuck"));
         Assert.Equal(
-            ["fuck", "fucker", "fucking", "fuckin", "shit", "shitter", "shitting", "shittin", "ass", "damn", "damning", "nigger", "nigga", "bitch", "bitching", "bitchin"],
+            ["fuck", "fucker", "fucking", "fuckin", "shit", "shitter", "shitting", "shittin", "ass", "damn", "damning", "nigger", "nigga", "bitch", "bitching", "bitchin", "dick", "cunt", "fag"],
             ProfanityCatalog.DefaultWordText.Split('\n'));
     }
 

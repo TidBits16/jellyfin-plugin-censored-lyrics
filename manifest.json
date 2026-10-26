@@ -8,6 +8,22 @@
         "category": "Music",
         "versions": [
             {
+                "version": "1.0.41.0",
+                "changelog": "Jellyfin 12. The default list includes dick, cunt, and fag.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.41.0/censored-lyrics_1.0.41.0.zip",
+                "checksum": "08a7e742bd70b76e538bd7467becff02",
+                "timestamp": "2026-10-26T16:15:58Z"
+            },
+            {
+                "version": "1.0.40.0",
+                "changelog": "Jellyfin 10.11. The default list includes dick, cunt, and fag.",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.41.0/censored-lyrics_1.0.40.0.zip",
+                "checksum": "27cfd26cce2bad39289a1a0e3d4799a7",
+                "timestamp": "2026-10-26T16:15:58Z"
+            },
+            {
                 "version": "1.0.39.0",
                 "changelog": "Jellyfin 12. A word is censored only when that exact word is on the list.",
                 "targetAbi": "12.0.0.0",
