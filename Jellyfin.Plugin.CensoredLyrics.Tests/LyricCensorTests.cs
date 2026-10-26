@@ -87,9 +87,9 @@ public class LyricCensorTests
         Assert.Equal("s***!", censor.Censor("shit!"));
         Assert.Equal("a**", censor.Censor("ass"));
         Assert.Equal("asshole", censor.Censor("asshole"));
-        Assert.Equal("s***", censor.Censor("sh1t"));
-        Assert.Equal("a**", censor.Censor("a$$"));
-        Assert.Equal("@**", censor.Censor("@ss"));
+        Assert.Equal("sh1t", censor.Censor("sh1t"));
+        Assert.Equal("a$$", censor.Censor("a$$"));
+        Assert.Equal("@ss", censor.Censor("@ss"));
         Assert.Equal("f*****'", censor.Censor("fuckin'"));
         Assert.Equal("b*******", censor.Censor("bitching"));
         Assert.Equal("s******", censor.Censor("shitter"));
@@ -106,6 +106,9 @@ public class LyricCensorTests
         var censor = ProfanityCatalog.Create(["beans"], CensorStyle.FirstLetter, MaskCharacters.Asterisk);
 
         Assert.Equal("b****", censor.Censor("beans"));
+        Assert.Equal("B****", censor.Censor("Beans"));
+        Assert.Equal("beaning", censor.Censor("beaning"));
+        Assert.Equal("be4ns", censor.Censor("be4ns"));
         Assert.Equal("fuck", censor.Censor("fuck"));
         Assert.Equal(
             ["fuck", "fucker", "fucking", "fuckin", "shit", "shitter", "shitting", "shittin", "ass", "damn", "damning", "nigger", "nigga", "bitch", "bitching", "bitchin"],

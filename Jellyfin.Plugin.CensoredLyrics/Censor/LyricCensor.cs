@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 using System.Text.RegularExpressions;
 using Jellyfin.Plugin.CensoredLyrics.Configuration;
 
@@ -113,23 +112,7 @@ public sealed partial class LyricCensor
 
     private bool IsProfane(string token)
     {
-        var normalized = Normalize(token);
-        if (normalized.Length < 3)
-        {
-            return false;
-        }
-
-        if (!normalized.Any(char.IsLetter))
-        {
-            return false;
-        }
-
-        return Matches(normalized);
-    }
-
-    private bool Matches(string word)
-    {
-        return _banned.Contains(word);
+        return _banned.Contains(Normalize(token));
     }
 
     private static HashSet<string> NormalizeAll(IEnumerable<string> words)
@@ -138,7 +121,7 @@ public sealed partial class LyricCensor
         foreach (var word in words)
         {
             var normalized = Normalize(word);
-            if (normalized.Length >= 3)
+            if (normalized.Length > 0)
             {
                 set.Add(normalized);
             }
@@ -149,45 +132,7 @@ public sealed partial class LyricCensor
 
     private static string Normalize(string word)
     {
-        var builder = new StringBuilder(word.Length);
-        foreach (var character in word.ToLower(CultureInfo.InvariantCulture))
-        {
-            switch (character)
-            {
-                case '\'':
-                case '’':
-                    break;
-                case '@':
-                case '4':
-                    builder.Append('a');
-                    break;
-                case '0':
-                    builder.Append('o');
-                    break;
-                case '1':
-                    builder.Append('i');
-                    break;
-                case '3':
-                    builder.Append('e');
-                    break;
-                case '5':
-                case '$':
-                    builder.Append('s');
-                    break;
-                case '7':
-                    builder.Append('t');
-                    break;
-                default:
-                    if (char.IsLetter(character))
-                    {
-                        builder.Append(character);
-                    }
-
-                    break;
-            }
-        }
-
-        return builder.ToString();
+        return word.ToLower(CultureInfo.InvariantCulture);
     }
 
     [GeneratedRegex(
