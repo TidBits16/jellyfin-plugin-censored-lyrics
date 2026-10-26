@@ -23,6 +23,7 @@ package_one() {
   local stage
   stage="$(mktemp -d)"
   cp "${dll}" "${stage}/Jellyfin.Plugin.CensoredLyrics.dll"
+  cp "${root}/assets/logo.png" "${stage}/logo.png"
   python3 - "${stage}/meta.json" "${version}" "${abi}" "${stamp}" "${changelog}" <<'PY'
 import json, sys
 path, version, abi, stamp, changelog = sys.argv[1:]
@@ -31,6 +32,7 @@ meta = {
     "changelog": changelog,
     "description": "Downloads timed lyrics from LRCLIB and censors words from an editable list.",
     "guid": "d045e257-f274-46e5-a2a7-b88f72c725e9",
+    "imagePath": "logo.png",
     "name": "Censored LRCLIB",
     "overview": "Timed LRCLIB lyrics with swear words censored.",
     "owner": "TidBits16",
@@ -43,20 +45,20 @@ with open(path, "w") as handle:
     handle.write("\n")
 PY
   local zip="${dist}/censored-lyrics_${version}.zip"
-  (cd "${stage}" && zip -X -q "${zip}" meta.json Jellyfin.Plugin.CensoredLyrics.dll)
+  (cd "${stage}" && zip -X -q "${zip}" meta.json Jellyfin.Plugin.CensoredLyrics.dll logo.png)
   rm -rf "${stage}"
 }
 
-package_one net10.0 1.0.47.0 12.0.0.0 "Jellyfin 12. Trailing apostrophes stay, so bitchin' becomes b******'."
-package_one net9.0 1.0.46.0 10.11.0.0 "Jellyfin 10.11. Trailing apostrophes stay, so bitchin' becomes b******'."
+package_one net10.0 1.0.49.0 12.0.0.0 "Jellyfin 12. Adds the plugin image."
+package_one net9.0 1.0.48.0 10.11.0.0 "Jellyfin 10.11. Adds the plugin image."
 
 python3 - "${dist}" "${stamp}" <<'PY'
 import hashlib, json, pathlib, sys
 dist, stamp = sys.argv[1:]
-repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.47.0"
+repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.49.0"
 entries = [
-    ("1.0.47.0", "12.0.0.0", "Jellyfin 12. Trailing apostrophes stay, so bitchin' becomes b******'."),
-    ("1.0.46.0", "10.11.0.0", "Jellyfin 10.11. Trailing apostrophes stay, so bitchin' becomes b******'."),
+    ("1.0.49.0", "12.0.0.0", "Jellyfin 12. Adds the plugin image."),
+    ("1.0.48.0", "10.11.0.0", "Jellyfin 10.11. Adds the plugin image."),
 ]
 manifest_path = pathlib.Path(dist).parent / "manifest.json"
 previous = json.loads(manifest_path.read_text())[0]["versions"] if manifest_path.exists() else []
@@ -86,6 +88,7 @@ manifest = [{
     "overview": "Timed LRCLIB lyrics with a word list you can edit.",
     "owner": "TidBits16",
     "category": "Music",
+    "imageUrl": "https://raw.githubusercontent.com/TidBits16/jellyfin-plugin-censored-lyrics/main/assets/logo.png",
     "versions": versions,
 }]
 path = pathlib.Path(dist).parent / "manifest.json"
