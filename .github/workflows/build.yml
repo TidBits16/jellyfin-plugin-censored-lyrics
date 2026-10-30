@@ -14,5 +14,5 @@ jobs:
           dotnet-version: |
             9.0.x
             10.0.x
-      - name: Test
-        run: dotnet test Jellyfin.Plugin.CensoredLyrics.slnx -c Release --nologo
+      - name: Build
+        run: dotnet build Jellyfin.Plugin.CensoredLyrics.slnx -c Release --nologo

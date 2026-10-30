@@ -1,13 +1,14 @@
 using System.Globalization;
-using System.Text.RegularExpressions;
+using System.Text;
 using Jellyfin.Plugin.CensoredLyrics.Configuration;
 
 namespace Jellyfin.Plugin.CensoredLyrics.Censor;
 
 /// <summary>
-/// Masks words from the configured list. LRC timestamps are left unchanged.
+/// Masks words from the configured list. Spaces and punctuation separate words.
+/// LRC timestamps in square or angle brackets are left unchanged.
 /// </summary>
-public sealed partial class LyricCensor
+public sealed class LyricCensor
 {
     private readonly HashSet<string> _banned;
     private readonly CensorStyle _style;
@@ -44,7 +45,7 @@ public sealed partial class LyricCensor
     }
 
     /// <summary>
-    /// Returns <paramref name="text"/> with listed words masked. Timestamps in square or angle brackets are preserved.
+    /// Returns <paramref name="text"/> with listed words masked.
     /// </summary>
     /// <param name="text">Lyric text, plain or LRC.</param>
     /// <returns>The censored text.</returns>
@@ -55,76 +56,76 @@ public sealed partial class LyricCensor
             return text ?? string.Empty;
         }
 
-        return TokenPattern().Replace(text, match =>
+        var result = new StringBuilder(text.Length);
+        for (var i = 0; i < text.Length;)
         {
-            if (match.Groups["word"].Success)
+            if (TryCopyTag(text, result, ref i))
             {
-                return CensorToken(match.Value);
+                continue;
             }
 
-            return match.Value;
-        });
+            if (!IsWordCharacter(text[i]))
+            {
+                result.Append(text[i]);
+                i++;
+                continue;
+            }
+
+            var start = i;
+            while (i < text.Length && IsWordCharacter(text[i]))
+            {
+                i++;
+            }
+
+            var word = text[start..i];
+            result.Append(_banned.Contains(Normalize(word)) ? Mask(word) : word);
+        }
+
+        return result.ToString();
     }
 
-    private string CensorToken(string token)
+    private static bool TryCopyTag(string text, StringBuilder result, ref int index)
     {
-        if (!IsProfane(token))
+        if (text[index] is not ('[' or '<'))
         {
-            return token;
+            return false;
         }
 
+        var close = text[index] == '[' ? ']' : '>';
+        var end = text.IndexOf(close, index + 1);
+        if (end < 0)
+        {
+            return false;
+        }
+
+        result.Append(text, index, end - index + 1);
+        index = end + 1;
+        return true;
+    }
+
+    private static bool IsWordCharacter(char character)
+    {
+        return char.IsLetterOrDigit(character);
+    }
+
+    private string Mask(string word)
+    {
         if (_mask == MaskCharacters.Brackets)
         {
-            var letters = token.Count(IsMaskedLetter);
-            var blanks = _style == CensorStyle.WholeWord ? letters : Math.Max(0, letters - 1);
+            var blanks = _style == CensorStyle.WholeWord ? word.Length : Math.Max(0, word.Length - 1);
             var inside = new string(' ', blanks);
-            var first = token.FirstOrDefault(IsMaskedLetter);
-            var trailing = token[LetterEnd(token)..];
             return _style == CensorStyle.WholeWord
-                ? "[" + inside + "]" + trailing
-                : first + "[" + inside + "]" + trailing;
+                ? "[" + inside + "]"
+                : word[0] + "[" + inside + "]";
         }
 
-        var chars = token.ToCharArray();
-        var started = _style == CensorStyle.WholeWord;
-        for (var i = 0; i < chars.Length; i++)
+        var chars = word.ToCharArray();
+        for (var i = _style == CensorStyle.WholeWord ? 0 : 1; i < chars.Length; i++)
         {
-            if (!IsMaskedLetter(chars[i]))
-            {
-                continue;
-            }
-
-            if (!started)
-            {
-                started = true;
-                continue;
-            }
-
-            chars[i] = MaskAt(token, i);
+            chars[i] = MaskAt(word, i);
         }
 
         return new string(chars);
-    }
-
-    private static bool IsMaskedLetter(char character)
-    {
-        return !IsApostrophe(character);
-    }
-
-    private static bool IsApostrophe(char character)
-    {
-        return character is '\'' or '\u2018' or '\u2019' or '\u02BC' or '`' or '\u00B4';
-    }
-
-    private static int LetterEnd(string token)
-    {
-        var end = token.Length;
-        while (end > 0 && IsApostrophe(token[end - 1]))
-        {
-            end--;
-        }
-
-        return end;
     }
 
     private char MaskAt(string token, int index)
@@ -145,11 +146,6 @@ public sealed partial class LyricCensor
         return _alphabet[bucket % _alphabet.Length];
     }
 
-    private bool IsProfane(string token)
-    {
-        return _banned.Contains(Normalize(token));
-    }
-
     private static HashSet<string> NormalizeAll(IEnumerable<string> words)
     {
         var set = new HashSet<string>(StringComparer.Ordinal);
@@ -167,12 +163,6 @@ public sealed partial class LyricCensor
 
     private static string Normalize(string word)
     {
-        var lowered = word.ToLower(CultureInfo.InvariantCulture);
-        return lowered[..LetterEnd(lowered)];
+        return word.ToLower(CultureInfo.InvariantCulture);
     }
-
-    [GeneratedRegex(
-        @"\[[^\]]*\]|<[^>]*>|(?<word>[\p{L}\d@$]+(?:['’\u02BC][\p{L}\d@$]+)*['’\u02BC]*)|[^\p{L}\d@$\[<]+",
-        RegexOptions.CultureInvariant)]
-    private static partial Regex TokenPattern();
 }

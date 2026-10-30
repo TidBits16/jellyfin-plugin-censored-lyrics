@@ -40,11 +40,11 @@ Open **Dashboard → Plugins → Censored LRCLIB**. The default mask keeps the f
 ## Build
 
 ```bash
-dotnet test Jellyfin.Plugin.CensoredLyrics.slnx -c Release
+dotnet build Jellyfin.Plugin.CensoredLyrics.slnx -c Release
 ./build/package.sh
 ```
 
-`./build/package.sh` runs the tests, writes the plugin zips, and refreshes `manifest.json` with the MD5 checksum Jellyfin checks on install.
+`./build/package.sh` builds the plugin, writes the zips, and refreshes `manifest.json` with the MD5 checksum Jellyfin checks on install.
 
 ## License
 

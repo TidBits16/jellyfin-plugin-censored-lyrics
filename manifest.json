@@ -9,6 +9,22 @@
         "imageUrl": "https://raw.githubusercontent.com/TidBits16/jellyfin-plugin-censored-lyrics/main/assets/logo.png",
         "versions": [
             {
+                "version": "1.0.59.0",
+                "changelog": "Jellyfin 12. Listed words match on their own, and the default list is updated.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.59.0/censored-lyrics_1.0.59.0.zip",
+                "checksum": "962b78a34a32e98d01b0335fec8e8943",
+                "timestamp": "2026-10-30T18:48:44Z"
+            },
+            {
+                "version": "1.0.58.0",
+                "changelog": "Jellyfin 10.11. Listed words match on their own, and the default list is updated.",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.59.0/censored-lyrics_1.0.58.0.zip",
+                "checksum": "39a7afb0b03c62896557277e3d6438a4",
+                "timestamp": "2026-10-30T18:48:44Z"
+            },
+            {
                 "version": "1.0.57.0",
                 "changelog": "Jellyfin 12. Force refresh is a button that overwrites lyrics.",
                 "targetAbi": "12.0.0.0",

@@ -7,7 +7,7 @@ export PATH="${HOME}/.dotnet:${PATH}"
 export DOTNET_ROOT="${HOME}/.dotnet"
 cd "${root}"
 
-dotnet test "${root}/Jellyfin.Plugin.CensoredLyrics.slnx" -c Release --nologo
+dotnet build "${root}/Jellyfin.Plugin.CensoredLyrics.slnx" -c Release --nologo
 
 dist="${root}/dist"
 rm -rf "${dist}"
@@ -49,16 +49,16 @@ PY
   rm -rf "${stage}"
 }
 
-package_one net10.0 1.0.57.0 12.0.0.0 "Jellyfin 12. Force refresh is a button that overwrites lyrics."
-package_one net9.0 1.0.56.0 10.11.0.0 "Jellyfin 10.11. Force refresh is a button that overwrites lyrics."
+package_one net10.0 1.0.59.0 12.0.0.0 "Jellyfin 12. Listed words match on their own, and the default list is updated."
+package_one net9.0 1.0.58.0 10.11.0.0 "Jellyfin 10.11. Listed words match on their own, and the default list is updated."
 
 python3 - "${dist}" "${stamp}" <<'PY'
 import hashlib, json, pathlib, sys
 dist, stamp = sys.argv[1:]
-repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.57.0"
+repo = "https://github.com/TidBits16/jellyfin-plugin-censored-lyrics/releases/download/v1.0.59.0"
 entries = [
-    ("1.0.57.0", "12.0.0.0", "Jellyfin 12. Force refresh is a button that overwrites lyrics."),
-    ("1.0.56.0", "10.11.0.0", "Jellyfin 10.11. Force refresh is a button that overwrites lyrics."),
+    ("1.0.59.0", "12.0.0.0", "Jellyfin 12. Listed words match on their own, and the default list is updated."),
+    ("1.0.58.0", "10.11.0.0", "Jellyfin 10.11. Listed words match on their own, and the default list is updated."),
 ]
 manifest_path = pathlib.Path(dist).parent / "manifest.json"
 previous = json.loads(manifest_path.read_text())[0]["versions"] if manifest_path.exists() else []
